@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RS Hermina Balikpapan - Paket MCU, Paket Layanan & Jadwal Dokter</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root{
+    --accent:#047857; --accent-2:#F5B301; --ink:#14213A; --muted:#55627A;
+    --glass:rgba(255,255,255,.58); --glass-strong:rgba(255,255,255,.78); --stroke:rgba(255,255,255,.7);
+  }
+  html{font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;color:var(--ink)}
+  body{min-height:100vh;background:#e6f4ea;position:relative;overflow-x:hidden}
+  /* Latar "Mica": gradasi biru lembut + bola cahaya blur */
+  body::before{content:"";position:fixed;inset:0;z-index:-2;
+    background:radial-gradient(60% 50% at 15% 10%,#7fdcaa 0%,transparent 70%),
+               radial-gradient(50% 50% at 90% 20%,#fde68a 0%,transparent 70%),
+               radial-gradient(60% 60% at 70% 95%,#86d9b0 0%,transparent 70%),
+               linear-gradient(160deg,#f0faf3,#fdf6dc)}
+  body::after{content:"";position:fixed;width:520px;height:520px;right:-140px;top:30%;z-index:-1;border-radius:50%;
+    background:rgba(4,120,87,.22);filter:blur(90px)}
+  .acrylic{background:var(--glass);backdrop-filter:blur(26px) saturate(1.7);-webkit-backdrop-filter:blur(26px) saturate(1.7);
+    border:1px solid var(--stroke);box-shadow:0 8px 30px rgba(6,78,59,.12),inset 0 1px 0 rgba(255,255,255,.6)}
+  .acrylic-strong{background:var(--glass-strong)}
+  .fluent-input{background:rgba(255,255,255,.7);border:1px solid rgba(20,33,58,.14);border-bottom:2px solid rgba(20,33,58,.35);border-radius:8px;
+    padding:.6rem .8rem;font-size:.875rem;width:100%;transition:border-color .15s,background .15s;color:var(--ink)}
+  .fluent-input:focus{outline:none;background:#fff;border-bottom-color:var(--accent)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;font-size:.875rem;font-weight:600;border-radius:8px;padding:.6rem 1rem;
+    transition:background .15s,transform .1s;cursor:pointer;border:1px solid transparent}
+  .btn:active{transform:scale(.98)}
+  .btn:focus-visible,a:focus-visible,.chip:focus-visible,.fluent-input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#065f46}
+  .btn-glass{background:rgba(255,255,255,.65);border-color:rgba(20,33,58,.14);color:var(--ink)}.btn-glass:hover{background:#fff}
+  .btn-wa{background:#128C4A;color:#fff}.btn-wa:hover{background:#0d6e3a}
+  .btn-danger{background:#F5B301;color:#14213A}.btn-danger:hover{background:#d99e00}
+  .chip{padding:.35rem .8rem;border-radius:999px;font-size:.8rem;font-weight:600;background:rgba(255,255,255,.6);border:1px solid rgba(20,33,58,.12);cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .card{border-radius:12px;transition:transform .15s,box-shadow .15s}
+  .card:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(6,78,59,.18)}
+  .titlebar{display:flex;align-items:center;justify-content:space-between;padding:.55rem .9rem;border-bottom:1px solid rgba(20,33,58,.08);font-size:.8rem;font-weight:600}
+  .dot{width:.7rem;height:.7rem;border-radius:50%;display:inline-block}
+  .slide{animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.slide{animation:none}.card,.btn{transition:none}}
+  @media (prefers-reduced-transparency:reduce){.acrylic{background:rgba(255,255,255,.95);backdrop-filter:none}}
+  th{font-weight:600;text-align:left}
+  .toast{position:fixed;right:1rem;bottom:1rem;z-index:80;max-width:22rem}
+
+  .siren{position:relative;width:38px;height:26px;flex:none}
+  .siren::before{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;border-radius:3px;background:#1f2937}
+  .siren i{position:absolute;bottom:5px;width:16px;height:16px;border-radius:9px 9px 2px 2px}
+  .siren .r{left:2px;background:#ef4444;animation:lampR .9s steps(1) infinite}
+  .siren .b{right:2px;background:#3b82f6;animation:lampB .9s steps(1) infinite}
+  @keyframes lampR{0%,49%{opacity:1;box-shadow:0 0 16px 6px rgba(239,68,68,.95)}50%,100%{opacity:.25;box-shadow:none}}
+  @keyframes lampB{0%,49%{opacity:.25;box-shadow:none}50%,100%{opacity:1;box-shadow:0 0 16px 6px rgba(59,130,246,.95)}}
+  @media (prefers-reduced-motion:reduce){.siren i{animation:none;opacity:1}}
+  .bullets{list-style:disc;padding-left:1.15rem;font-size:.875rem;line-height:1.5}
+  .bullets li{margin:.1rem 0}
+  details>summary{cursor:pointer;font-weight:600;font-size:.875rem;color:var(--accent);list-style:none}
+  details>summary::-webkit-details-marker{display:none}
+  details[open]>summary .chev{transform:rotate(90deg)}
+  .modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:1rem;background:rgba(20,33,58,.35);backdrop-filter:blur(6px)}
+  .modal.open{display:flex}
+  .radio-row{display:flex;align-items:center;gap:.6rem;padding:.55rem .75rem;border-radius:8px;background:rgba(255,255,255,.6);border:1px solid rgba(20,33,58,.12);cursor:pointer;font-size:.875rem;font-weight:600}
+  .radio-row:has(input:checked){border-color:var(--accent);background:rgba(4,120,87,.1)}
+
+  .tile{display:flex;flex-direction:column;height:100%}
+  .clamp1,.clamp2,.clamp3{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .clamp1{-webkit-line-clamp:1}.clamp2{-webkit-line-clamp:2}.clamp3{-webkit-line-clamp:3}
+  .bh{font-weight:700;margin-top:.8rem;font-size:.9rem}
+  .bh:first-child{margin-top:0}
+  .admin td{vertical-align:top}
+  .daylist li{font-size:.8rem;line-height:1.35rem}
+</style>
+</head>
+<body>
+<script>
+  /* ===== KONFIGURASI ===== */
+  const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // URL Web App hasil Deploy (berakhiran /exec)
+  const WA_NUMBER = '628115555123';      // Cadangan bila sheet Contacts kosong (format 62..., tanpa +)
+  const SPGDT_NUMBER = '6281257793819';  // Cadangan WhatsApp SPGDT (utama: sheet Contacts, purposes igd)
+  const LOGO_URL = '';                   // Logo transparan, mis. 'logo-hermina.png' (satu folder dengan index.html)
+</script>
+
+<!-- BAR IGD & SPGDT + NAVBAR -->
+<div class="sticky top-0 z-40">
+  <a id="spgdt-bar" href="#" target="_blank" rel="noopener" class="flex items-center justify-center gap-3 px-4 py-2 text-white text-sm font-semibold" style="background:#064e3b" aria-label="IGD dan layanan SPGDT 24 jam, chat WhatsApp">
+    <span class="siren" aria-hidden="true"><i class="r"></i><i class="b"></i></span>
+    <span><span id="spgdt-text">IGD & Layanan SPGDT 24 Jam</span> <span id="spgdt-sub" class="font-normal opacity-90 hidden sm:inline"></span></span>
+    <i data-lucide="message-circle" class="w-4 h-4 shrink-0"></i>
+  </a>
+  <nav class="acrylic" style="border-radius:0 0 14px 14px;border-top:0" aria-label="Navigasi utama">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3 px-4 lg:px-10 py-3">
+      <a href="#top" class="flex items-center gap-3">
+        <span id="brand-logo" class="flex items-center justify-center w-10 h-10 rounded-xl text-white" style="background:linear-gradient(135deg,var(--accent),var(--accent-2))"><i data-lucide="heart-pulse" class="w-5 h-5"></i></span>
+        <span class="leading-tight"><span class="block font-bold text-[1.05rem]">RS Hermina</span><span class="block text-xs" style="color:var(--muted)">Balikpapan</span></span>
+      </a>
+      <div class="hidden lg:flex items-center gap-1 text-sm font-semibold">
+        <a href="#promos" class="px-3 py-2 rounded-lg hover:bg-white/60">Promo</a>
+        <a href="#mcu" class="px-3 py-2 rounded-lg hover:bg-white/60">Paket MCU</a>
+        <a href="#layanan" class="px-3 py-2 rounded-lg hover:bg-white/60">Paket layanan</a>
+        <a href="#doctors" class="px-3 py-2 rounded-lg hover:bg-white/60">Jadwal dokter</a>
+        <a href="#telemedicine" class="px-3 py-2 rounded-lg hover:bg-white/60">Telemedicine</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a id="emergency-link" class="btn btn-danger" href="#"><i data-lucide="phone-call" class="w-4 h-4"></i><span class="hidden sm:inline">Emergency Call</span></a>
+        <button id="btn-admin" class="btn btn-glass" onclick="openLogin()"><i data-lucide="lock" class="w-4 h-4"></i><span class="hidden sm:inline">Login Admin</span></button>
+      </div>
+    </div>
+  </nav>
+</div>
+
+<main id="top" class="max-w-7xl mx-auto px-4 lg:px-10 py-8 space-y-14">
+
+  <!-- HERO + PROMO -->
+  <section id="promos" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div class="lg:col-span-5 space-y-5 lg:pt-6">
+      <h1 id="hero-title" class="text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]"></h1>
+      <p id="hero-text" class="text-base leading-relaxed" style="color:var(--muted);max-width:34rem"></p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#mcu" class="btn btn-primary"><i data-lucide="clipboard-list" class="w-4 h-4"></i>Lihat Paket MCU</a>
+        <a href="#doctors" class="btn btn-glass"><i data-lucide="calendar-days" class="w-4 h-4"></i>Jadwal dokter</a>
+      </div>
+    </div>
+    <div class="lg:col-span-7">
+      <div class="acrylic rounded-2xl overflow-hidden" id="carousel" aria-roledescription="carousel" aria-label="Promo">
+        <div class="titlebar"><span class="flex items-center gap-2"><i data-lucide="tag" class="w-4 h-4" style="color:var(--accent)"></i>Promo</span><span id="promo-counter" class="text-xs" style="color:var(--muted)"></span></div>
+        <div id="carousel-slides" class="min-h-[300px]" aria-live="polite"></div>
+        <div class="flex items-center justify-between px-3 py-2.5 border-t" style="border-color:rgba(20,33,58,.08)">
+          <button class="btn btn-glass !px-2.5" onclick="moveSlide(-1)" aria-label="Sebelumnya"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+          <div id="carousel-dots" class="flex gap-2"></div>
+          <button class="btn btn-glass !px-2.5" onclick="moveSlide(1)" aria-label="Berikutnya"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAKET MCU -->
+  <section id="mcu" class="space-y-5">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-3">
+      <div><h2 class="text-2xl font-bold">Katalog Paket MCU</h2><p id="mcu-note" class="text-sm mt-1" style="color:var(--muted)"></p></div>
+      <input id="mcu-search" class="fluent-input md:w-72" type="search" placeholder="Cari paket atau pemeriksaan..." oninput="renderMcu()" aria-label="Cari paket MCU">
+    </div>
+    <div id="mcu-chips" class="flex flex-wrap gap-2" role="group" aria-label="Filter kategori paket"></div>
+    <div id="mcu-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr gap-5"></div>
+  </section>
+
+  <!-- PAKET LAYANAN -->
+  <section id="layanan" class="space-y-5">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-3">
+      <div><h2 class="text-2xl font-bold">Katalog Paket Layanan</h2><p class="text-sm mt-1" style="color:var(--muted)">Vaksinasi, persalinan, home care, dan layanan lainnya.</p></div>
+      <input id="pkg-search" class="fluent-input md:w-72" type="search" placeholder="Cari paket layanan..." oninput="renderPkgs()" aria-label="Cari paket layanan">
+    </div>
+    <div id="pkg-chips" class="flex flex-wrap gap-2" role="group" aria-label="Filter kategori layanan"></div>
+    <div id="pkg-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr gap-5"></div>
+  </section>
+
+  <!-- JADWAL DOKTER -->
+  <section id="doctors" class="space-y-5">
+    <div>
+      <h2 class="text-2xl font-bold">Jadwal dokter</h2>
+      <p class="text-sm mt-1" style="color:var(--muted)">Update <span id="jadwal-update"></span></p>
+    </div>
+    <div id="payer-chips" class="flex flex-wrap gap-2" role="group" aria-label="Jenis poliklinik"></div>
+    <p id="payer-info" class="text-sm font-semibold min-h-[1.25rem]"></p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <input id="doctor-search" class="fluent-input" type="search" placeholder="Cari nama dokter..." oninput="resetDocs()" aria-label="Cari dokter">
+      <select id="doctor-spec" class="fluent-input" onchange="resetDocs()" aria-label="Filter spesialisasi"></select>
+      <select id="doctor-day" class="fluent-input" onchange="resetDocs()" aria-label="Filter hari">
+        <option value="">Semua hari</option><option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option>
+      </select>
+    </div>
+    <p id="doctor-count" class="text-sm" style="color:var(--muted)"></p>
+    <div id="doctors-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr gap-5"></div>
+    <div class="text-center"><button id="doctor-more" class="btn btn-glass hidden" onclick="S.docLimit+=24;renderDoctors()">Tampilkan lebih banyak</button></div>
+    <div class="acrylic rounded-xl px-4 py-3 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <p id="jadwal-note"></p>
+      <span class="flex gap-2 shrink-0"><button class="btn btn-wa !py-1.5" onclick="chatStaff()"><i data-lucide="message-circle" class="w-4 h-4"></i>Chat petugas</button><a id="ig-link" class="btn btn-glass !py-1.5" href="#" target="_blank" rel="noopener"><i data-lucide="instagram" class="w-4 h-4"></i><span id="ig-label">Instagram</span></a></span>
+    </div>
+  </section>
+
+  <!-- TELEMEDICINE -->
+  <section id="telemedicine" class="acrylic rounded-2xl overflow-hidden">
+    <div class="titlebar"><span class="flex items-center gap-2"><i data-lucide="video" class="w-4 h-4" style="color:var(--accent)"></i>Telemedicine & tele konsultasi</span></div>
+    <form id="tele-form" class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 lg:p-10" onsubmit="sendTele(event)">
+      <div class="space-y-4">
+        <h2 class="text-2xl font-bold">Daftar telemedicine</h2>
+        <p style="color:var(--muted)" class="text-sm">Isi data, pilih dokter dan petugas. Pesan WhatsApp akan terisi otomatis.</p>
+        <fieldset><legend class="text-sm font-semibold mb-1">Petugas yang dihubungi</legend><div id="tele-staff" class="grid gap-2"></div></fieldset>
+        <div><label class="block text-sm font-semibold mb-1" for="t-name">Nama pasien</label><input id="t-name" class="fluent-input" required maxlength="100" autocomplete="name"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label class="block text-sm font-semibold mb-1" for="t-spec">Spesialisasi</label><select id="t-spec" class="fluent-input" required onchange="fillTeleDoctors()"></select></div>
+          <div><label class="block text-sm font-semibold mb-1" for="t-doc">Dokter yang dituju</label><select id="t-doc" class="fluent-input" required></select></div>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1" for="t-addr">Alamat pasien</label>
+          <textarea id="t-addr" class="fluent-input" rows="3" required maxlength="400" placeholder="Ketik alamat, atau pakai tombol Lokasi saya"></textarea>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <button type="button" class="btn btn-primary !py-1.5" onclick="useMyLocation()"><i data-lucide="locate-fixed" class="w-4 h-4"></i>Lokasi saya</button>
+            <button type="button" class="btn btn-glass !py-1.5" onclick="searchAddress()"><i data-lucide="map-pin" class="w-4 h-4"></i>Cari alamat di peta</button>
+          </div>
+        </div>
+        <div id="map-box" class="hidden rounded-xl overflow-hidden border" style="border-color:rgba(20,33,58,.15)">
+          <iframe id="map-frame" title="Peta lokasi pasien" class="w-full" style="height:210px;border:0" loading="lazy"></iframe>
+          <div class="px-3 py-2 text-xs flex flex-wrap justify-between gap-2" style="background:rgba(255,255,255,.7)"><span id="coord-text"></span><a id="map-open" target="_blank" rel="noopener" class="font-semibold" style="color:var(--accent)">Buka di FreeMap</a></div>
+        </div>
+        <div><label class="block text-sm font-semibold mb-1" for="t-link">Titik koordinat (tautan peta)</label><input id="t-link" class="fluent-input" placeholder="Terisi otomatis, atau tempel tautan Google Maps / FreeMap / aplikasi peta lain"></div>
+        <button class="btn btn-wa w-full" type="submit"><i data-lucide="send" class="w-4 h-4"></i>Kirim ke WhatsApp</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- DASHBOARD ADMIN -->
+  <section id="admin-panel" class="acrylic rounded-2xl overflow-hidden hidden" aria-label="Dashboard admin">
+    <div class="titlebar">
+      <span class="flex items-center gap-2"><span class="dot" style="background:#0F7B0F"></span>Dashboard admin <span id="admin-name" class="font-normal" style="color:var(--muted)"></span></span>
+      <button class="btn btn-glass !py-1.5" onclick="logout()"><i data-lucide="log-out" class="w-4 h-4"></i>Keluar</button>
+    </div>
+    <div class="p-4 space-y-3">
+      <div id="admin-tabs" class="flex flex-wrap gap-2" role="tablist"></div>
+      <p id="admin-help" class="text-sm" style="color:var(--muted)"></p>
+      <div class="flex flex-wrap gap-2">
+        <input id="admin-search" class="fluent-input sm:w-72" type="search" placeholder="Cari data..." oninput="renderAdmin()" aria-label="Cari data admin">
+        <button id="admin-add" class="btn btn-primary" onclick="openEdit(null)"><i data-lucide="plus" class="w-4 h-4"></i>Tambah data</button>
+      </div>
+      <div class="overflow-x-auto"><table class="admin w-full text-sm min-w-[620px]"><thead id="admin-head" style="color:var(--muted)"></thead><tbody id="admin-body"></tbody></table></div>
+      <p id="admin-more" class="text-xs" style="color:var(--muted)"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="max-w-7xl mx-auto px-4 lg:px-10 pb-10 text-sm" style="color:var(--muted)">© <span id="year"></span> RS Hermina Balikpapan. <span id="footer-text"></span></footer>
+
+<!-- MODAL RINCIAN (umum) -->
+<div id="detail-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+  <div class="acrylic acrylic-strong rounded-2xl w-full max-w-lg overflow-hidden max-h-[92vh] flex flex-col">
+    <div class="titlebar"><span id="detail-title" class="pr-2"></span><button type="button" class="p-1 rounded hover:bg-black/10" onclick="closeModals()" aria-label="Tutup"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div id="detail-body" class="p-5 overflow-y-auto"></div>
+  </div>
+</div>
+
+<!-- MODAL PESAN PAKET / PROMO -->
+<div id="order-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="order-title">
+  <form class="acrylic acrylic-strong rounded-2xl w-full max-w-lg overflow-hidden max-h-[92vh] overflow-y-auto" onsubmit="sendOrder(event)">
+    <div class="titlebar"><span id="order-title">Form pemesanan</span><button type="button" class="p-1 rounded hover:bg-black/10" onclick="closeModals()" aria-label="Tutup"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div class="p-6 space-y-4">
+      <fieldset><legend class="text-sm font-semibold mb-1">Pilih petugas yang dihubungi</legend><div id="order-staff" class="grid gap-2"></div></fieldset>
+      <div><label class="block text-sm font-semibold mb-1" for="o-name">Nama pasien</label><input id="o-name" class="fluent-input" required maxlength="100" autocomplete="name"></div>
+      <div><label class="block text-sm font-semibold mb-1" for="o-addr">Alamat</label><textarea id="o-addr" class="fluent-input" rows="2" required maxlength="300"></textarea></div>
+      <div><label class="block text-sm font-semibold mb-1" for="o-pack">Nama paket yang diambil</label><input id="o-pack" class="fluent-input" required maxlength="150"></div>
+      <div id="o-opt-wrap" class="hidden"><label class="block text-sm font-semibold mb-1" for="o-opt">Pilihan paket</label><select id="o-opt" class="fluent-input"></select></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="block text-sm font-semibold mb-1" for="o-date">Rencana pelaksanaan</label><input id="o-date" type="date" class="fluent-input" required></div>
+        <div><label class="block text-sm font-semibold mb-1" for="o-note">Catatan jam (opsional)</label><input id="o-note" class="fluent-input" maxlength="80" placeholder="Contoh: pagi"></div>
+      </div>
+      <button class="btn btn-wa w-full" type="submit"><i data-lucide="send" class="w-4 h-4"></i>Lanjut ke WhatsApp</button>
+    </div>
+  </form>
+</div>
+
+<!-- MODAL BOOKING DOKTER -->
+<div id="book-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="book-title">
+  <form class="acrylic acrylic-strong rounded-2xl w-full max-w-lg overflow-hidden max-h-[92vh] overflow-y-auto" onsubmit="sendBooking(event)">
+    <div class="titlebar"><span id="book-title">Booking dokter</span><button type="button" class="p-1 rounded hover:bg-black/10" onclick="closeModals()" aria-label="Tutup"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div class="p-6 space-y-4">
+      <fieldset><legend class="text-sm font-semibold mb-1">Pilih petugas yang dihubungi</legend><div id="book-staff" class="grid gap-2"></div></fieldset>
+      <div><label class="block text-sm font-semibold mb-1" for="b-name">Nama pasien</label><input id="b-name" class="fluent-input" required maxlength="100" autocomplete="name"></div>
+      <div><label class="block text-sm font-semibold mb-1" for="b-addr">Alamat</label><textarea id="b-addr" class="fluent-input" rows="2" required maxlength="300"></textarea></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="block text-sm font-semibold mb-1" for="b-spec">Spesialisasi</label><input id="b-spec" class="fluent-input" readonly></div>
+        <div><label class="block text-sm font-semibold mb-1" for="b-doc">Nama dokter</label><input id="b-doc" class="fluent-input" readonly></div>
+      </div>
+      <p id="b-days" class="text-xs" style="color:var(--muted)"></p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><label class="block text-sm font-semibold mb-1" for="b-date">Rencana berobat</label><input id="b-date" type="date" class="fluent-input" required></div>
+        <div><label class="block text-sm font-semibold mb-1" for="b-pay">Penjaminan</label><select id="b-pay" class="fluent-input" required><option>Perusahaan</option><option>Asuransi (Non BPJS)</option><option>Pribadi</option></select></div>
+      </div>
+      <button class="btn btn-wa w-full" type="submit"><i data-lucide="send" class="w-4 h-4"></i>Lanjut ke WhatsApp</button>
+    </div>
+  </form>
+</div>
+
+<!-- MODAL LOGIN -->
+<div id="login-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+  <form class="acrylic acrylic-strong rounded-2xl w-full max-w-sm overflow-hidden" onsubmit="doLogin(event)">
+    <div class="titlebar"><span id="login-title">Login admin</span><button type="button" class="p-1 rounded hover:bg-black/10" onclick="closeModals()" aria-label="Tutup"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div class="p-6 space-y-4">
+      <div><label class="block text-sm font-semibold mb-1" for="login-user">Username</label><input id="login-user" type="text" class="fluent-input" required autocomplete="username" autocapitalize="none"></div>
+      <div><label class="block text-sm font-semibold mb-1" for="login-pass">Kata sandi</label><input id="login-pass" type="password" class="fluent-input" required autocomplete="current-password"></div>
+      <p id="login-error" class="text-sm hidden" style="color:#C42B1C" role="alert"></p>
+      <button id="login-btn" class="btn btn-primary w-full" type="submit">Masuk</button>
+    </div>
+  </form>
+</div>
+
+<!-- MODAL EDIT ADMIN (dibuat dinamis) -->
+<div id="edit-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-title">
+  <form class="acrylic acrylic-strong rounded-2xl w-full max-w-xl overflow-hidden max-h-[92vh] flex flex-col" onsubmit="saveEdit(event)">
+    <div class="titlebar"><span id="edit-title"></span><button type="button" class="p-1 rounded hover:bg-black/10" onclick="closeModals()" aria-label="Tutup"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+    <div id="edit-body" class="p-5 space-y-3 overflow-y-auto"></div>
+    <div class="p-4 border-t flex gap-2 justify-between" style="border-color:rgba(20,33,58,.1)">
+      <button id="edit-del" type="button" class="btn btn-glass" onclick="deleteEdit()"><i data-lucide="trash-2" class="w-4 h-4"></i>Hapus</button>
+      <button id="edit-save" type="submit" class="btn btn-primary">Simpan</button>
+    </div>
+  </form>
+</div>
+
+<div id="toast" class="toast hidden acrylic acrylic-strong rounded-xl px-4 py-3 text-sm font-semibold" role="status"></div>
+
+<script>
+/* ===== DATA AWAL (cadangan bila API_URL belum diisi / server gagal) ===== */
+const SEED = {"promos":[{"id":"PROMO-01","title":"Promo Vaksinasi Influenza & Pneumonia","description":"Lindungi diri dan keluarga Anda dari flu dan radang paru-paru.","bannerUrl":"","discountDetails":"Dewasa dan anak","startDate":"","endDate":"","isActive":true,"details":"Vaksin influenza dewasa Rp 350.000\nVaksin pneumonia dewasa Rp 1.220.000\nVaksin influenza anak Rp 550.000\nVaksin pneumonia anak Rp 1.420.000","price":""},{"id":"PROMO-02","title":"Promo Vaksin HPV Gardasil 9","description":"Perlindungan lebih luas untuk masa depan yang lebih sehat.","bannerUrl":"","discountDetails":"Pilihan 1x atau 3x suntik","startDate":"","endDate":"","isActive":true,"details":"Paket dokter OBGYN mulai Rp 2.500.000\nPaket dokter umum mulai Rp 2.354.000\nUntuk laki-laki dan perempuan sesuai rekomendasi dokter","price":""},{"id":"PROMO-03","title":"Paket Promo Persalinan Normal & SC","description":"Paket Partus Spontan dan Operasi SC ERACS.","bannerUrl":"","discountDetails":"Kelas 1, 2, dan 3","startDate":"","endDate":"","isActive":true,"details":"Partus spontan mulai Rp 5.360.255\nOperasi SC ERACS mulai Rp 19.930.642\nFree dekor kamar untuk kelas minimal Kelas 1","price":""},{"id":"PROMO-04","title":"Paket Vaksin Umroh & Haji","description":"Meningitis + Polio, lindungi diri sebelum beribadah ke Tanah Suci.","bannerUrl":"","discountDetails":"Paket 3 atau 5 orang","startDate":"","endDate":"","isActive":true,"details":"Paket 3 orang Rp 1.750.000\nPaket 5 orang Rp 2.470.000\nTermasuk konsultasi dokter dan sertifikat vaksin internasional (E-ICV)","price":""}],"mcu":[{"id":"TG01901001","name":"MCU Simple","category":"Paket Umum","items":"Konsultasi Dokter Umum - Poliklinik\nHematologi RUTIN-1\nGlukosa Darah Puasa (GDP)\nGlukosa Urine 2 Jam Post Prandial\nAsam Urat\nCholesterol Total\nJasa Sarana Klinis MCU","total":667000},{"id":"TG01901003","name":"MCU Silver","category":"Paket Umum","items":"Konsultasi Dokter Spesialis\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nHematologi Lengkap\nUrine Lengkap\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nCholesterol Total\nCholesterol High Density Lipoprotein (HDL)\nCholesterol-Low Density Lipoprotein (LDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti HBS (Anti Hepatitis B Surface)\nVenereal Disease Research Laboratory (VDRL)\nJasa Sarana Klinis MCU","total":3441000},{"id":"TG01901004","name":"MCU Gold Pria","category":"Paket Umum","items":"Konsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nKonsultasi Dokter Gigi Umum Tanpa Tindakan\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nUSG Abdomen\nHematologi Lengkap\nUrine Lengkap\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nCholesterol Total\nCholesterol High Density Lipoprotein (HDL)\nCholesterol-Low Density Lipoprotein (LDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti HBS (Anti Hepatitis B Surface)\nVenereal Disease Research Laboratory (VDRL)\nCarcinoembryonic Antigen (CEA)\nJasa Sarana Klinis MCU","total":5227000},{"id":"TG01901005","name":"MCU Gold Wanita","category":"Paket Umum","items":"Konsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nKonsultasi Dokter Gigi Umum Tanpa Tindakan\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nUSG Abdomen\nHematologi Lengkap\nUrine Lengkap\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nCholesterol Total\nCholesterol High Density Lipoprotein (HDL)\nCholesterol-Low Density Lipoprotein (LDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti HBS (Anti Hepatitis B Surface)\nVenereal Disease Research Laboratory (VDRL)\nCarcinoembryonic Antigen (CEA)\nJasa Sarana Klinis MCU","total":5227000},{"id":"TG01901006","name":"MCU Diamond Pria","category":"Paket Umum","items":"Konsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nKonsultasi Dokter Gigi Umum Tanpa Tindakan\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nUSG Abdomen\nPemeriksaan Treadmill (Cardiac Stress Test)\nAudiografi Dengan Protokol\nUji Spirometri\nHematologi Lengkap\nUrine Lengkap\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nCholesterol Total\nCholesterol High Density Lipoprotein (HDL)\nCholesterol-Low Density Lipoprotein (LDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti HBS (Anti Hepatitis B Surface)\nAnti Hepatitis Virus C (Anti HCV)\nVenereal Disease Research Laboratory (VDRL)\nProstat Spesifik Antigen (PSA)\nJasa Sarana Klinis MCU","total":8633000},{"id":"TG01901007","name":"MCU Diamond Wanita","category":"Paket Umum","items":"Konsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nKonsultasi Dokter Gigi Umum Tanpa Tindakan\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nUSG Abdomen\nUSG Mammae\nPemeriksaan Treadmill (Cardiac Stress Test)\nAudiografi Dengan Protokol\nUji Spirometri\nHematologi Lengkap\nUrine Lengkap\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nCholesterol Total\nCholesterol High Density Lipoprotein (HDL)\nCholesterol-Low Density Lipoprotein (LDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti HBS (Anti Hepatitis B Surface)\nAnti Hepatitis Virus C (Anti HCV)\nVenereal Disease Research Laboratory (VDRL)\nCarcinoembryonic Antigen (CEA)\nPap Smear\nJasa Sarana Klinis MCU","total":9220000},{"id":"TG01901008","name":"MCU Platinum Pria","category":"Paket Umum","items":"Konsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nKonsultasi Dokter Gigi Umum Tanpa Tindakan\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nUSG Abdomen\nPemeriksaan Echocardiography\nPemeriksaan Treadmill (Cardiac Stress Test)\nAudiografi Dengan Protokol\nUji Spirometri\nMRI Brain\nHematologi Lengkap\nUrine Lengkap\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti HBS (Anti Hepatitis B Surface)\nAnti Hepatitis Virus C (Anti HCV)\nVenereal Disease Research Laboratory (VDRL)\nProstat Spesifik Antigen (PSA)\nFree T4\nThyroid Stimulating Hormone (TSH)\nFolicle Stimulating Hormone (FSH)\nJasa Sarana Klinis MCU","total":16755000},{"id":"TG01901009","name":"MCU Platinum Wanita","category":"Paket Umum","items":"Konsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nKonsultasi Dokter Gigi Umum Tanpa Tindakan\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nUSG Abdomen\nPemeriksaan USG Ginekologi Abdominal 2D\nPemeriksaan Echocardiography\nUSG Mammae\nPemeriksaan Treadmill (Cardiac Stress Test)\nAudiografi Dengan Protokol\nUji Spirometri\nMRI Brain\nHematologi Lengkap\nUrine Lengkap\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti HBS (Anti Hepatitis B Surface)\nAnti Hepatitis Virus C (Anti HCV)\nVenereal Disease Research Laboratory (VDRL)\nCarcinoembryonic Antigen (CEA)\nCA 15-3\nFree T4\nThyroid Stimulating Hormone (TSH)\nFolicle Stimulating Hormone (FSH)\nPap Smear\nJasa Sarana Klinis MCU","total":18935000},{"id":"TG01901010","name":"MCU Premarital","category":"Pra-Nikah","items":"Konsultasi Dokter Umum - Poliklinik\nHematologi Lengkap\nGolongan Darah + Rhesus\nUrine Lengkap\nGlukosa Darah Sewaktu (GDS)\nHBSAG (Hepatitis B Surface Antigen)\nAnti Human Immunodeficiency Virus (HIV) ELISA\nAnti Hepatitis Virus C (Anti HCV)\nVenereal Disease Research Laboratory (VDRL)\nAnti Toxoplasma IGM\nAnti Rubella IGM\nAnti Cytomegalovirus (CMV) IGM\nX-Ray Thorax PA\nUSG Abdomen\nUSG Testis\nJasa Sarana Klinis MCU","total":7432000},{"id":"TG01901011","name":"MCU Pre Employment","category":"Kerja & Karyawan","items":"Konsultasi Dokter Umum - Poliklinik\nGlukosa Darah Puasa (GDP)\nUrine Lengkap\nHematologi Lengkap\nHBSAG (Hepatitis B Surface Antigen)\nX-Ray Thorax PA\nSurat Keterangan Kerja OH (Ocupational Health)\nJasa Sarana Klinis MCU","total":1259000},{"id":"TG01901012","name":"MCU Femina","category":"Wanita & Lansia","items":"Konsultasi Dokter Spesialis\nPap Smear\nPemeriksaan USG Ginekologi Transvaginal 2D\nX-Ray Mammography\nUSG Mammae\nJasa Sarana Klinis MCU","total":2616000},{"id":"TG01901013","name":"MCU Skrining Payudara","category":"Wanita & Lansia","items":"Konsultasi Dokter Umum - Poliklinik\nX-Ray Mammography\nUSG Mammae\nJasa Sarana Klinis MCU","total":1780000},{"id":"TG01901015","name":"MCU Kardiologi","category":"Jantung & Gaya Hidup","items":"Konsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nCholesterol Total\nCholesterol High Density Lipoprotein (HDL)\nCholesterol-Low Density Lipoprotein (LDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHb Glikosilat (HBA1C)\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nAsam Urat\nUreum\nKreatinin\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nPemeriksaan Treadmill (Cardiac Stress Test)\nPemeriksaan Echocardiography\nUji Spirometri\nJasa Sarana Klinis MCU","total":5468000},{"id":"TG01901017","name":"MCU Geriatri","category":"Wanita & Lansia","items":"Konsultasi Dokter Spesialis\nTes Komprehensif Geriatri\nTes Gangguan Fungsi Luhur\nHematologi Lengkap\nUrine Lengkap\nAsam Urat\nUreum\nKreatinin\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nCholesterol Total\nCholesterol High Density Lipoprotein (HDL)\nCholesterol-Low Density Lipoprotein (LDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHb Glikosilat (HBA1C)\nThyroid Stimulating Hormone (TSH)\nX-Ray Thorax PA\nUSG Abdomen\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Electrocardiogram (EKG)\nAudiografi Dengan Protokol\nPemeriksaan Echocardiography\nJasa Sarana Klinis MCU\nMinnesota Multiphasic Personality Inventory (MMPI) Test\nJasa Sarana Klinis MCU","total":8794000},{"id":"TG01901257","name":"Paket MCU Screening Narkoba","category":"Kerja & Karyawan","items":"Konsultasi Dokter Umum - Poliklinik\nTes Narkoba 5 Parameter (AMP. MAMP. THC. MOP. COC)\nJasa Sarana Klinis MCU\nKonsultasi Dokter Spesialis","total":786000},{"id":"TG01901258","name":"Paket MCU Pre Employee","category":"Kerja & Karyawan","items":"Konsultasi Dokter Umum - Poliklinik\nGlukosa Darah Puasa (GDP)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nHematologi Lengkap\nUrine Lengkap\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nKonsultasi Baca Hasil Pemeriksaan MCU\nJasa Sarana Klinis MCU","total":1500000},{"id":"TG01901259","name":"Paket MCU Lifestyle","category":"Jantung & Gaya Hidup","items":"Konsultasi Dokter Umum - Poliklinik\nHematologi Lengkap\nCholesterol Total\nCholesterol-Low Density Lipoprotein (LDL)\nCholesterol High Density Lipoprotein (HDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nUreum\nKreatinin\nSerum Glutamic Pyruvic Transaminase (SGPT)\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nAsam Urat\nHBSAG Rapid (Hepatitis B Surface Antigen)\nUrine Lengkap\nPemeriksaan Electrocardiography (EKG)\nX-Ray Thorax PA\nKonsultasi Baca Hasil Pemeriksaan MCU\nJasa Sarana Klinis MCU","total":2659000},{"id":"TG01901262","name":"Paket MCU Pre Marital Wanita","category":"Pra-Nikah","items":"Konsultasi Dokter Umum - Poliklinik\nGolongan Darah + Rhesus\nHematologi Lengkap\nUrine Lengkap\nGlukosa Darah Sewaktu (GDS)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti Human Immunodeficiency Virus (HIV) Rapid\nAnti Hepatitis Virus C (Anti HCV)\nVenereal Disease Research Laboratory (VDRL)\nAnti Toxoplasma IGM\nAnti Rubella IGM\nAnti Cytomegalovirus (CMV) IGM\nUSG Abdomen\nX-Ray Thorax PA\nJasa Sarana Klinis MCU","total":6074000},{"id":"TG01901263","name":"Paket MCU Pre Marital Pria","category":"Pra-Nikah","items":"Konsultasi Dokter Umum - Poliklinik\nGolongan Darah + Rhesus\nHematologi Lengkap\nUrine Lengkap\nGlukosa Darah Sewaktu (GDS)\nHBSAG Rapid (Hepatitis B Surface Antigen)\nAnti Human Immunodeficiency Virus (HIV) Rapid\nAnti Hepatitis Virus C (Anti HCV)\nVenereal Disease Research Laboratory (VDRL)\nX-Ray Thorax PA\nUSG Abdomen\nUSG Testis\nJasa Sarana Klinis MCU","total":4326000},{"id":"TG01901264","name":"Paket MCU Cardio Advance","category":"Jantung & Gaya Hidup","items":"Jasa Sarana Klinis MCU\nKonsultasi Dokter Umum - Poliklinik\nKonsultasi Dokter Spesialis\nCholesterol Total\nCholesterol-Low Density Lipoprotein (LDL)\nCholesterol High Density Lipoprotein (HDL)\nTrigliserida\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nHb Glikosilat (HBA1C)\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nX-Ray Thorax PA\nPemeriksaan Electrocardiography (EKG)\nPemeriksaan Treadmill (Cardiac Stress Test)\nPemeriksaan Echocardiography\nKonsultasi Baca Hasil Pemeriksaan MCU","total":5231000},{"id":"TG01901265","name":"Paket MCU Field Worker","category":"Kerja & Karyawan","items":"Konsultasi Dokter Umum - Poliklinik\nHematologi Lengkap\nUrine Lengkap\nGlukosa Darah Puasa (GDP)\nGlukosa Darah 2 Jam Post Prandial (GD2PP)\nSerum Glutamic Oxaloacetic Transaminase (SGOT)\nSerum Glutamic Pyruvic Transaminase (SGPT)\nUreum\nKreatinin\nAsam Urat\nHBSAG Rapid (Hepatitis B Surface Antigen)\nCholesterol Total\nCholesterol-Low Density Lipoprotein (LDL)\nCholesterol High Density Lipoprotein (HDL)\nTrigliserida\nPemeriksaan Electrocardiography (EKG)\nX-Ray Thorax PA\nKonsultasi Dokter Spesialis\nAudiografi Dengan Protokol\nJasa Sarana Klinis MCU","total":3237000}],"packages":[{"id":"PKG-001","name":"Promo Vaksinasi Influenza & Pneumonia (Dewasa)","category":"Vaksinasi","description":"Lindungi diri dan keluarga Anda, cegah flu dan radang paru-paru. Konsultasi dengan dokter umum untuk vaksinasi yang sesuai kebutuhan.","details":"Manfaat vaksinasi:\nMelindungi dari influenza musiman\nMelindungi dari infeksi paru-paru berat akibat pneumokokus\nMenjaga kesehatan diri dan keluarga agar tetap aktif beraktivitas\nVaksin Influenza:\nMencegah influenza musiman\nMengurangi risiko komplikasi seperti pneumonia\nMembantu tubuh tetap sehat dan aktif beraktivitas\nVaksin Pneumonia:\nMelindungi dari 20 strain bakteri pneumokokus\nMencegah infeksi paru-paru berat (pneumonia)\nGenerasi terbaru dengan cakupan perlindungan lebih luas","options":"Vaksin Influenza|350000\nVaksin Pneumonia|1220000","terms":"","note":"","isActive":true},{"id":"PKG-002","name":"Promo Vaksinasi Influenza & Pneumonia (Anak)","category":"Vaksinasi","description":"Perlindungan untuk si kecil, langkah menuju masa depan yang lebih sehat. Konsultasi dengan dokter spesialis anak sesuai usia dan kebutuhan.","details":"Manfaat vaksinasi:\nMelindungi si kecil dari influenza dan mengurangi risiko komplikasinya\nMelindungi dari penyakit akibat bakteri pneumokokus, termasuk pneumonia\nMendukung tumbuh kembang si kecil dengan vaksinasi sesuai rekomendasi dokter\nVaksin Influenza:\nMembantu mencegah influenza\nMengurangi risiko komplikasi flu\nMendukung perlindungan kesehatan anak\nVaksin Pneumonia:\nMelindungi dari 20 strain bakteri pneumokokus\nMencegah infeksi paru-paru berat (pneumonia)\nGenerasi terbaru dengan cakupan perlindungan lebih luas","options":"Vaksin Influenza|550000\nVaksin Pneumonia|1420000","terms":"","note":"","isActive":true},{"id":"PKG-003","name":"Promo Vaksin HPV Gardasil 9","category":"Vaksinasi","description":"Perlindungan lebih luas untuk masa depan yang lebih sehat.","details":"Manfaat:\nMelindungi dari 9 tipe HPV, termasuk tipe penyebab kanker dan kutil kelamin\nMembantu mencegah kanker serviks, vagina, vulva, anus, penis, dan kanker lainnya yang disebabkan oleh HPV\nDapat diberikan kepada laki-laki dan perempuan sesuai rekomendasi dokter","options":"Paket Dokter OBGYN - 1x Suntik|2500000\nPaket Dokter OBGYN - 3x Suntik|7300000\nPaket Dokter Umum - 1x Suntik|2354000\nPaket Dokter Umum - 3x Suntik|7000000","terms":"","note":"","isActive":true},{"id":"PKG-004","name":"Paket Vaksin Umroh & Haji (Meningitis + Polio)","category":"Vaksinasi","description":"Lindungi diri dan keluarga Anda sebelum beribadah ke Tanah Suci.","details":"Manfaat Vaksin Meningitis:\nMelindungi dari infeksi meningitis (radang selaput otak dan sumsum tulang belakang)\nMencegah penyebaran penyakit di lingkungan padat seperti asrama dan jamaah haji/umroh\nMenjaga kesehatan dan kelancaran ibadah Anda\nManfaat Vaksin Polio:\nMelindungi dari penyakit polio yang dapat menyebabkan kelumpuhan permanen\nMencegah penularan virus polio di lingkungan internasional termasuk di negara tujuan\nMenambah rasa aman selama perjalanan ibadah umroh/haji\nFasilitas yang didapatkan:\nKonsultasi dokter\nPemeriksaan kesehatan dasar\nElektronik Sertifikat Vaksin Internasional (E-ICV)","options":"Paket 3 Orang|1750000\nPaket 5 Orang|2470000","terms":"","note":"RS Hermina Balikpapan, Jl. MT. Haryono No. 45, Sepinggan Baru, Balikpapan","isActive":true},{"id":"PKG-005","name":"Paket Promo Persalinan Normal & SC","category":"Persalinan","description":"Paket Partus Spontan dan Paket Operasi SC ERACS.","details":"Paket Partus Spontan:\nKelas 1 (One bed one room)\nKelas 2 (Two bed one room)\nKelas 3 (Three bed one room)\nPaket Operasi SC ERACS:\nKelas 1 (One bed one room)\nKelas 2 (Two bed one room)\nKelas 3 (Three bed one room)","options":"Partus Spontan - Kelas 1 (One bed one room)|9587183\nPartus Spontan - Kelas 2 (Two bed one room)|7985821\nPartus Spontan - Kelas 3 (Three bed one room)|5360255\nOperasi SC ERACS - Kelas 1 (One bed one room)|25384266\nOperasi SC ERACS - Kelas 2 (Two bed one room)|22352111\nOperasi SC ERACS - Kelas 3 (Three bed one room)|19930642","terms":"Berlaku untuk persalinan normal (tanpa penyulit atau indikasi medis tertentu)\nFree dekor kamar pasien tersedia untuk kelas perawatan minimal Kelas 1\nDokumentasi (foto) momen bahagia kelahiran bayi untuk kelas perawatan minimal Kelas 1*\nKhusus penjaminan pribadi\nFasilitas bertanda (*) berlaku sesuai kesepakatan dan ketentuan yang berlaku","note":"","isActive":true},{"id":"PKG-006","name":"Layanan Home Care","category":"Home Care","description":"Perawatan kesehatan lebih dekat, lebih nyaman di rumah Anda.","details":"Perawat Homecare:\nPerawatan luka\nPemasangan & perawatan alat medis\nKontrol tanda vital\nEdukasi kesehatan\nPendampingan pasien di rumah\nNebu Homecare:\nMembantu melegakan saluran pernapasan\nSesuai indikasi dan anjuran tenaga medis\nDapat dilakukan untuk anak maupun dewasa\nInfus Vitamin:\nMembantu memenuhi kebutuhan cairan & vitamin\nDilakukan oleh tenaga profesional\nSesuai hasil penilaian klinis oleh dokter","options":"","terms":"","note":"Call Center Hermina 1500-488","isActive":true}],"docs":[["dr. Ida Pramayanti, Sp.OG","Spesialis Kandungan (OBGYN)","Non BPJS",{"Senin":"17.00-18.00","Selasa":"11.30-13.00 / 17.00-18.00","Rabu":"17.00-18.00","Kamis":"11.30-13.00 / 17.00-18.00","Jumat":"11.30-13.00 / 17.00-18.00","Sabtu":"09.00-12.00"}],["dr. Ketut Widaya, Sp.OG","Spesialis Kandungan (OBGYN)","Non BPJS",{"Selasa":"19.00-21.00","Rabu":"19.00-20.00","Kamis":"19.00-21.00","Jumat":"16.00-18.00"}],["dr. Roy Yudha Nugraha, Sp.OG","Spesialis Kandungan (OBGYN)","Non BPJS",{"Senin":"08.30-09.00","Selasa":"08.30-09.00","Rabu":"08.30-09.00","Kamis":"08.30-09.00","Jumat":"08.30-09.00"}],["dr. Stella Patricia Yapari, Sp.OG","Spesialis Kandungan (OBGYN)","Non BPJS",{"Senin":"13.30-14.30","Selasa":"13.30-14.30","Rabu":"13.30-14.30","Kamis":"13.30-14.30","Jumat":"13.30-14.30"}],["dr. Yulia Putri Permatasari, Sp.OG","Spesialis Kandungan (OBGYN)","Non BPJS",{"Senin":"08.00-11.00 / 15.00-16.00","Selasa":"08.00-11.00 / 15.00-16.00","Rabu":"08.00-11.00 / 15.00-16.00","Kamis":"08.00-11.00 / 15.00-16.00","Jumat":"08.00-11.00 / 15.00-16.00","Sabtu":"08.00-11.00"}],["dr. Tengku Syariful Anwar, Sp.OG","Spesialis Kandungan (OBGYN)","Non BPJS",{"Senin":"11.00-14.00","Selasa":"11.00-14.00","Rabu":"11.00-14.00","Kamis":"11.00-14.00","Jumat":"11.00-14.00","Sabtu":"11.00-13.00"}],["dr. Tri Seno, Sp.OG (K)","Spesialis Kandungan (OBGYN)","Non BPJS",{"Senin":"09.00-11.00 / 11.00-13.00 / 20.00-21.00","Selasa":"09.00-11.00","Rabu":"09.00-11.00 / 11.00-13.00 / 20.00-21.00","Kamis":"09.00-11.00","Jumat":"09.00-11.00 / 20.00-21.00"}],["dr. Ketut Rama Wijaya, Sp.OG","Spesialis Kandungan (OBGYN)","Non BPJS",{"Senin":"19.00-20.00","Selasa":"19.00-20.00","Rabu":"19.00-20.00","Kamis":"19.00-20.00","Jumat":"19.00-20.00","Sabtu":"14.00-16.00","Minggu":"10.00-12.00"}],["dr. Baiq F Zahra, Sp.A","Spesialis Anak","Non BPJS",{"Senin":"17.00-19.00","Selasa":"18.00-19.00"}],["dr. Hittoh Fattory, Sp.A","Spesialis Anak","Non BPJS",{"Senin":"09.00-14.00 / 19.30-21.00","Selasa":"09.00-14.00 / 19.30-21.00","Rabu":"09.00-14.00 / 19.30-21.00","Kamis":"09.00-14.00 / 19.30-21.00","Jumat":"09.00-14.00 / 19.30-21.00","Sabtu":"09.00-12.00"}],["dr. Landelina Lany T, Sp.A","Spesialis Anak","Non BPJS",{"Senin":"09.30-12.00 / 20.00-21.00","Selasa":"09.30-12.00","Rabu":"09.30-12.30 / 20.00-21.00","Kamis":"09.30-12.00","Jumat":"09.30-12.00 / 20.00-21.00"}],["dr. Tonny Hartanto, Sp.A","Spesialis Anak","Non BPJS",{"Senin":"18.30-19.30","Selasa":"18.30-19.30","Rabu":"18.30-19.30","Kamis":"18.30-19.30","Jumat":"18.30-19.30","Sabtu":"16.00-17.30","Minggu":"10.30-12.00"}],["dr. Medina Permatawati, Sp.A","Spesialis Anak","Non BPJS",{"Senin":"08.00-09.00 / 13.00-15.00 / 19.00-20.00","Selasa":"08.00-09.00 / 13.00-15.00 / 19.00-20.30","Rabu":"08.00-09.00 / 13.00-17.00 / 19.00-20.30","Kamis":"08.00-09.00 / 13.00-17.00 / 19.00-20.30","Jumat":"08.00-09.00 / 13.00-15.00","Sabtu":"08.00-11.00 / 14.00-15.30","Minggu":"09.00-11.00 (Hanya pada Minggu ke-3 setiap bulan)"}],["dr. Izzah Baridah, Sp.A","Spesialis Anak","Non BPJS",{"Senin":"16.30-18.00","Selasa":"16.30-18.00","Rabu":"16.30-18.00","Kamis":"16.30-18.00","Jumat":"16.30-18.00","Sabtu":"11.30-14.00","Minggu":"10.00-12.00"}],["dr. Aldora Jesslyn Oentari, SpA","Spesialis Anak","Non BPJS",{"Rabu":"18.00-19.00","Jumat":"16.00-19.00","Sabtu":"16.00-19.00","Minggu":"09.00-12.00"}],["dr. Nani Sulistyarini, Sp.PD","Spesialis Penyakit Dalam","Non BPJS",{"Senin":"08.00-09.00 / 16.00-18.00","Selasa":"08.00-09.00 / 16.00-18.00","Rabu":"08.00-09.00 / 16.00-18.00","Kamis":"08.00-09.00 / 16.00-18.00","Jumat":"08.00-09.00 / 16.00-18.00"}],["dr. Restu Ratnaningsih, Sp.PD","Spesialis Penyakit Dalam","Non BPJS",{"Senin":"08.00-09.00 / 14.00-18.00","Selasa":"08.00-09.00 / 14.00-18.00","Rabu":"08.00-09.00 / 14.00-18.00","Kamis":"08.00-09.00 / 14.00-18.00","Jumat":"08.00-09.00 / 14.00-18.00","Sabtu":"10.00-12.00"}],["dr. Rentha Monica, Sp.PD","Spesialis Penyakit Dalam","Non BPJS",{"Senin":"20.00-21.00","Selasa":"20.00-21.00","Rabu":"18.00-19.00","Kamis":"20.00-21.00","Jumat":"20.00-21.00","Sabtu":"17.00-18.00"}],["dr. Henky Ricardo Yapari, Sp.PD","Spesialis Penyakit Dalam","Non BPJS",{"Senin":"12.00-15.00","Selasa":"12.00-15.00","Rabu":"12.00-13.00","Kamis":"12.00-15.00","Jumat":"12.00-15.00","Sabtu":"09.00-10.00 / 12.00-15.00","Minggu":"11.00-13.00"}],["dr. Dwi Putri, Sp.PD","Spesialis Penyakit Dalam","Non BPJS",{"Senin":"13.00-14.00","Selasa":"09.00-11.00","Rabu":"13.00-14.00","Kamis":"09.00-11.00","Jumat":"09.00-13.00"}],["dr. Bungsu Wahyu Sp.PD, Subsp. Kv (K), FINASIM","Spesialis Penyakit Dalam","Non BPJS",{"Jumat":"19.00-21.00","Sabtu":"10.00-12.00","Minggu":"09.00-11.00"}],["dr. Teddy Kristiyan, Sp.M","Spesialis Mata","Non BPJS",{"Selasa":"08.00-10.00","Rabu":"08.00-10.00","Kamis":"08.00-10.00","Sabtu":"08.00-14.00"}],["dr. Christiana, Sp.M","Spesialis Mata","Non BPJS",{"Rabu":"15.00-17.00","Kamis":"15.00-17.00"}],["dr. Yunia Solihat, Sp.M","Spesialis Mata","Non BPJS",{"Senin":"14.30-16.30","Selasa":"14.30-16.30","Jumat":"14.30-16.30"}],["dr. Nidia Astriani SP.M","Spesialis Mata","Non BPJS",{"Senin":"08.00-14.00 / 19.00-20.00","Selasa":"11.00-14.00 / 19.00-20.00","Rabu":"11.00-14.00 / 19.00-20.00","Kamis":"11.00-14.00 / 19.00-20.00","Jumat":"08.00-14.00 / 19.00-20.00","Sabtu":"15.00-17.00"}],["dr. Windy Krisanti, Sp.N","Spesialis Saraf","Non BPJS",{"Senin":"10.00-13.00 / 14.00-15.00","Selasa":"10.00-13.00 / 14.00-15.00","Rabu":"10.00-13.00 / 14.00-15.00","Kamis":"10.00-13.00 / 14.00-15.00","Jumat":"10.00-13.00 / 14.00-15.00","Sabtu":"09.00-10.00"}],["dr. Kristina Dwi Wahyuni, SpS","Spesialis Saraf","Non BPJS",{"Senin":"09.00-12.00 / 15.00-16.00","Selasa":"09.00-12.00 / 15.00-16.00","Rabu":"09.00-12.00 / 15.00-16.00","Kamis":"09.00-12.00 / 15.00-16.00","Jumat":"09.00-12.00 / 15.00-16.00","Sabtu":"08.00-10.00 / 13.00-16.00","Minggu":"12.00-15.00"}],["dr. Angie Renatha A, Sp.THT-KL","Spesialis THT","Non BPJS",{"Senin":"09.00-11.00 / 13.00-14.00 / 19.00-20.00","Selasa":"09.00-11.00 / 13.00-14.00 / 19.00-20.00","Rabu":"09.00-11.00 / 13.00-14.00 / 19.00-20.00","Kamis":"09.00-11.00 / 13.00-14.00 / 19.00-20.00","Jumat":"09.00-11.00 / 13.00-14.00 / 19.00-20.00","Sabtu":"09.00-11.00"}],["dr. Magdalena Oktavia, Sp.THT-KL","Spesialis THT","Non BPJS",{"Rabu":"16.30-19.00","Sabtu":"12.00-15.00","Minggu":"09.00-11.00"}],["dr. Aditya Brahmono, Sp.THT-KL","Spesialis THT","Non BPJS",{"Senin":"16.30-17.30","Selasa":"16.30-17.30","Kamis":"16.30-17.30","Jumat":"16.30-17.30","Sabtu":"16.30-17.30"}],["dr. Nuriah, Sp.DVE, FINSDV, FAADV","Spesialis Kulit Dan Kelamin","Non BPJS",{"Senin":"19.00-21.00","Selasa":"19.00-21.00","Rabu":"19.00-21.00","Jumat":"19.00-21.00"}],["dr. Tengku N. S. Dayang, Sp.DV","Spesialis Kulit Dan Kelamin","Non BPJS",{"Senin":"11.00-12.00","Rabu":"11.00-12.00","Sabtu":"09.00-11.00","Minggu":"10.00-12.00"}],["dr. Ardsari Azminingrum, Sp.DVE, FINSDV","Spesialis Kulit Dan Kelamin","Non BPJS",{"Senin":"14.00-16.00","Selasa":"09.00-10.00","Rabu":"14.00-16.00","Kamis":"09.00-10.00"}],["dr. Yvonne Agneta Serafien W, Sp.JP, FIHA","Spesialis Jantung","Non BPJS",{"Senin":"08.00-10.00 / 12.00-14.00","Selasa":"08.00-10.00 / 12.00-14.00","Rabu":"08.00-10.00 / 12.00-14.00","Kamis":"08.00-10.00 / 12.00-14.00","Jumat":"08.00-10.00 / 12.00-14.00","Sabtu":"12.00-15.00"}],["dr. Maurits Marpaung, Sp.P","Spesialis Paru","Non BPJS",{"Senin":"16.00-17.30","Rabu":"16.00-17.00","Kamis":"16.00-18.00","Sabtu":"10.00-11.00"}],["dr. Subagyo, Sp.P","Spesialis Paru","Non BPJS",{"Senin":"08.00-10.00","Selasa":"19.00-21.00","Kamis":"08.00-10.00","Jumat":"19.00-21.00"}],["dr. Aryani Prawita Sari, Sp.P","Spesialis Paru","Non BPJS",{"Senin":"19.00-21.00","Rabu":"19.00-21.00","Kamis":"19.00-21.00","Sabtu":"15.00-17.00"}],["dr. Ferdinand H. Simanjuntak, Sp.B","Spesialis Bedah Umum","Non BPJS",{"Senin":"10.00-13.00 / 15.00-17.00","Selasa":"10.00-13.00 / 15.00-17.00","Rabu":"10.00-13.00 / 15.00-17.00","Kamis":"10.00-13.00 / 15.00-17.00","Jumat":"10.00-13.00 / 15.00-17.00","Sabtu":"10.00-14.00","Minggu":"09.00-12.00"}],["dr. M.N. Khairuddin, Sp.B","Spesialis Bedah Umum","Non BPJS",{"Senin":"14.00-16.00","Selasa":"19.00-20.00","Rabu":"14.00-16.00","Kamis":"19.00-20.00","Sabtu":"13.00-14.00"}],["dr. Moch. Rudi Antoni, Sp.B","Spesialis Bedah Umum","Non BPJS",{"Senin":"18.00-19.00","Selasa":"18.00-19.00","Rabu":"18.00-19.00","Kamis":"18.00-19.00","Jumat":"18.00-19.00","Sabtu":"16.00-18.00"}],["dr. Muhammad Aries Fitrian, Sp.B, FINACS, FICS, AIFO-K","Spesialis Bedah Umum","Non BPJS",{"Senin":"20.00-21.00","Rabu":"20.00-21.00","Jumat":"20.00-21.00","Sabtu":"19.00-21.00","Minggu":"11.00-14.00"}],["dr. Efrem Hoesman Ciputra, Ho, Sp.B","Spesialis Bedah Umum","Non BPJS",{"Senin":"15.00-19.00","Selasa":"15.00-19.00","Rabu":"15.00-19.00","Kamis":"15.00-19.00","Jumat":"15.00-19.00","Sabtu":"17.00-21.00","Minggu":"09.00-15.00"}],["dr. Lindayanti T, Sp.BA","Spesialis Bedah Anak","Non BPJS",{"Senin":"09.00-12.00","Selasa":"09.00-12.00 / 15.00-17.00","Rabu":"09.00-12.00","Kamis":"09.00-12.00 / 15.00-17.00","Jumat":"09.00-12.00"}],["dr. Iman Martafani, Sp.BA","Spesialis Bedah Anak","Non BPJS",{"Senin":"16.00-18.00","Rabu":"16.00-18.00","Jumat":"16.00-18.00","Sabtu":"10.00-12.00"}],["dr. Yuliana Rianto, Sp.OT (K)","Spesialis Bedah Tulang","Non BPJS",{"Senin":"09.00-10.00","Selasa":"09.00-10.00","Jumat":"09.00-10.00"}],["dr. Hendra Gunawan, Sp.OT","Spesialis Bedah Tulang","Non BPJS",{"Senin":"19.00-20.00","Selasa":"17.00-18.00","Rabu":"19.00-20.00","Kamis":"17.00-18.00","Jumat":"18.00-19.00"}],["dr. M. Haris Wibowo, Sp.OT","Spesialis Bedah Tulang","Non BPJS",{"Senin":"18.00-19.00","Selasa":"20.00-21.00","Sabtu":"15.00-17.00","Minggu":"10.00-12.00"}],["dr. Yusuf Brilliant, Sp.BS, FINSS","Spesialis Bedah Saraf","Non BPJS",{"Senin":"17.00-18.00","Rabu":"17.00-18.00","Kamis":"18.00-19.00","Sabtu":"12.00-13.00"}],["dr. Endra Wibisono H, Sp.BS, M.Ked.Klin","Spesialis Bedah Saraf","Non BPJS",{"Selasa":"18.00-19.00","Jumat":"13.00-14.00","Minggu":"13.00-14.00"}],["dr. Grace Rongre, Sp.B.P.R.E, FICS","Spesialis Bedah Plastik","Non BPJS",{"Selasa":"09.00-10.30","Kamis":"14.00-16.00","Jumat":"09.00-10.30"}],["dr. Elvis Deddy Kurniawan SP.B(K) Onk","Spesialis Bedah Onkologi","Non BPJS",{"Selasa":"16.00-17.00","Jumat":"18.00-19.00"}],["dr. Eddy Sunarno, Sp.U","Spesialis Urologi","Non BPJS",{"Senin":"18.00-19.00","Selasa":"18.00-19.00","Rabu":"18.00-19.00","Kamis":"18.00-19.00","Jumat":"18.00-19.00","Sabtu":"14.00-16.00"}],["dr. Vincentius Daniel, Sp.B-KBD","Spesialis Bedah Digestive","Non BPJS",{"Senin":"19.00-20.00","Selasa":"09.00-12.00 / 19.00-20.00","Rabu":"19.00-20.00","Kamis":"09.00-12.00 / 19.00-20.00","Sabtu":"09.00-11.00"}],["dr. Christian Dananto, Sp.BTKV","Spesialis Bedah Kardiovaskular","Non BPJS",{"Senin":"18.00-19.00","Selasa":"18.00-19.00","Rabu":"18.00-19.00","Kamis":"18.00-19.00"}],["dr. Andre Grahana Baskara S, SpB, SubSp BVE (K)","Spesialis Bedah Kardiovaskular","Non BPJS",{"Rabu":"12.00-13.00","Jumat":"18.00-19.00","Sabtu":"18.00-19.00"}],["dr. Emy Pramita Utami, Sp.GK","Spesialis Gizi Klinik","Non BPJS",{"Jumat":"15.00-16.00","Sabtu":"15.00-16.00"}],["dr. Dradjat Witjaksono, Sp.KJ","Spesialis Kedokteran Jiwa","Non BPJS",{"Senin":"18.00-19.00","Selasa":"18.00-19.00","Rabu":"18.00-19.00","Kamis":"18.00-19.00","Jumat":"18.00-19.00"}],["drg. Conny Setyaning Mahargyani","Dokter Gigi Umum","Non BPJS",{"Senin":"10.00-12.00 / 13.00-16.00","Selasa":"13.00-17.00","Rabu":"10.00-12.00","Kamis":"13.00-16.00","Jumat":"13.00-16.00"}],["drg. Rani Amalia Putri","Dokter Gigi Umum","Non BPJS",{"Rabu":"13.00-16.00","Jumat":"19.30-21.00","Sabtu":"15.00-17.00"}],["drg. Nurul Izaty","Dokter Gigi Umum","Non BPJS",{"Senin":"08.00-10.00","Selasa":"08.00-10.00","Rabu":"08.00-10.00","Jumat":"08.00-10.00"}],["drg. Elya Blandina Ginting, Sp.BM","Spesialis Bedah Mulut","Non BPJS",{"Senin":"10.00-12.00 / 19.00-21.00","Selasa":"10.00-12.00 / 19.00-21.00","Rabu":"10.00-12.00 / 19.00-21.00","Kamis":"10.00-12.00 / 19.00-21.00","Jumat":"10.00-12.00 / 15.00-19.00","Sabtu":"13.00-17.00","Minggu":"11.00-14.00"}],["drg. Endah Srimulyani, Sp.KGA","Spesialis Kedokteran Gigi Anak","Non BPJS",{"Sabtu":"08.00-10.00","Minggu":"08.00-10.00"}],["drg. Faizal Hasan, Sp.KGA","Spesialis Kedokteran Gigi Anak","Non BPJS",{"Senin":"08.00-10.00","Selasa":"08.00-10.00","Rabu":"08.00-10.00","Kamis":"08.00-10.00","Jumat":"08.00-10.00"}],["drg. Ervita Koelestyana, Sp.KG","Spesialis Konservasi Gigi","Non BPJS",{"Selasa":"12.00-14.00","Kamis":"12.00-14.00","Sabtu":"10.00-12.00"}],["drg. Koerniasari Eriko, SpKG","Spesialis Konservasi Gigi","Non BPJS",{"Selasa":"16.30-18.30","Rabu":"16.30-18.30","Jumat":"16.30-18.30"}],["drg. Mohammad Riza Tofani, Sp.PERIO","Spesialis Periodonsi","Non BPJS",{"Senin":"19.00-21.00","Rabu":"19.00-21.00","Kamis":"19.00-21.00","Jumat":"19.00-21.00","Sabtu":"19.00-21.00"}],["dr. Heryadi Bawono Putro, SP. F. M","Spesialis Forensik & Medikolegal","Non BPJS",{"Senin":"16.00-18.00","Selasa":"16.00-18.00","Rabu":"16.00-18.00","Kamis":"16.00-18.00","Jumat":"16.00-18.00"}],["drg. Anastasia Purnama Agustina SP. Pros","Spesialis Prostodonsia","Non BPJS",{"Senin":"17.00-19.00","Selasa":"19.00-21.00","Rabu":"17.00-19.00","Kamis":"17.00-19.00","Jumat":"10.00-12.00","Sabtu":"12.00-14.00"}],["Dokter Umum (Lantai 1)","Poli Umum Lantai 1","Non BPJS",{"Senin":"09.00-14.00 / 16.00-20.00","Selasa":"09.00-14.00 / 16.00-20.00","Rabu":"09.00-14.00 / 16.00-20.00","Kamis":"09.00-14.00 / 16.00-20.00","Jumat":"09.00-14.00 / 16.00-20.00","Sabtu":"09.00-14.00 / 16.00-20.00","Minggu":"09.00-13.00 / 16.00-20.00"}],["dr. Ida Pramayanti, Sp.OG","Spesialis Kandungan (OBGYN)","BPJS",{"Senin":"10.00-11.00 / 15.30-16.30","Selasa":"10.00-11.00 / 15.30-16.30","Rabu":"10.00-11.00 / 15.30-16.30","Kamis":"10.00-11.00 / 15.30-16.30","Jumat":"10.00-11.00 / 15.30-16.30"}],["dr. Ketut Widaya, Sp.OG","Spesialis Kandungan (OBGYN)","BPJS",{"Senin":"19.00-21.00","Rabu":"20.00-21.00","Jumat":"19.00-21.00"}],["dr. Roy Yudha Nugraha, Sp.OG","Spesialis Kandungan (OBGYN)","BPJS",{"Senin":"07.30-08.30","Selasa":"07.30-08.30","Rabu":"07.30-08.30","Kamis":"07.30-08.30","Jumat":"07.30-08.30"}],["dr. Stella Patricia Yapari, Sp.OG","Spesialis Kandungan (OBGYN)","BPJS",{"Senin":"12.00-13.30","Selasa":"12.00-13.30","Rabu":"12.00-13.30","Kamis":"12.00-13.30","Jumat":"12.00-13.30"}],["dr. Yulia Putri Permatasari, Sp.OG","Spesialis Kandungan (OBGYN)","BPJS",{"Senin":"11.00-12.00 / 13.00-15.00","Selasa":"11.00-12.00 / 13.00-15.00","Rabu":"11.00-12.00 / 13.00-15.00","Kamis":"11.00-12.00 / 13.00-15.00","Jumat":"11.00-12.00 / 13.00-15.00","Sabtu":"11.00-12.00"}],["dr. Tengku Syariful Anwar, Sp.OG","Spesialis Kandungan (OBGYN)","BPJS",{"Senin":"09.00-13.00","Selasa":"09.00-13.00","Rabu":"09.00-13.00","Kamis":"09.00-13.00","Jumat":"09.00-13.00","Sabtu":"09.00-13.00"}],["dr. Tri Seno, Sp.OG (K)","Spesialis Kandungan (OBGYN)","BPJS",{"Senin":"19.00-20.00","Rabu":"19.00-20.00","Jumat":"19.00-20.00"}],["dr. Ketut Rama Wijaya, Sp.OG","Spesialis Kandungan (OBGYN)","BPJS",{"Selasa":"20.00-21.00","Kamis":"20.00-21.00","Sabtu":"12.00-14.00"}],["dr. Baiq F Zahra, Sp.A","Spesialis Anak","BPJS",{"Selasa":"17.00-18.00"}],["dr. Hittoh Fattory, Sp.A","Spesialis Anak","BPJS",{"Senin":"14.30-15.30","Selasa":"14.30-15.30","Rabu":"14.30-15.30","Kamis":"14.30-15.30","Jumat":"14.30-15.30"}],["dr. Landelina Lany T, Sp.A","Spesialis Anak","BPJS",{"Senin":"12.30-14.30 / 19.00-20.00","Selasa":"12.30-14.30","Rabu":"12.30-14.30 / 19.00-20.00","Kamis":"12.30-14.30","Jumat":"12.30-14.30 / 19.00-20.00"}],["dr. Tonny Hartanto, Sp.A","Spesialis Anak","BPJS",{"Senin":"19.30-21.00","Selasa":"19.30-21.00","Rabu":"19.30-21.00","Kamis":"19.30-21.00","Jumat":"19.30-21.00","Sabtu":"14.00-16.00"}],["dr. Medina Permatawati, Sp.A","Spesialis Anak","BPJS",{"Senin":"09.00-12.00","Selasa":"09.00-12.00","Rabu":"09.00-12.00","Kamis":"09.00-12.00","Jumat":"09.00-12.00","Sabtu":"11.00-12.00"}],["dr. Izzah Baridah, Sp.A","Spesialis Anak","BPJS",{"Senin":"18.00-19.00","Rabu":"18.00-19.00","Jumat":"18.00-19.00"}],["dr. Aldora Jesslyn Oentari, SpA","Spesialis Anak","BPJS",{"Senin":"16.30-18.30","Selasa":"16.30-18.30","Rabu":"16.30-18.30","Kamis":"16.30-18.30"}],["dr. Nani Sulistyarini, Sp.PD","Spesialis Penyakit Dalam","BPJS",{"Senin":"09.00-13.00","Selasa":"13.00-15.00","Rabu":"09.00-13.00","Kamis":"13.00-15.00","Jumat":"09.00-13.00"}],["dr. Restu Ratnaningsih, Sp.PD","Spesialis Penyakit Dalam","BPJS",{"Senin":"09.00-13.00","Selasa":"09.00-13.00","Rabu":"09.00-13.00","Kamis":"09.00-13.00","Jumat":"09.00-13.00","Sabtu":"08.00-10.00"}],["dr. Rentha Monica, Sp.PD","Spesialis Penyakit Dalam","BPJS",{"Senin":"17.00-20.00","Selasa":"17.00-20.00","Rabu":"17.00-18.00","Kamis":"17.00-20.00","Jumat":"17.00-20.00","Sabtu":"13.00-17.00"}],["dr. Henky Ricardo Yapari, Sp.PD","Spesialis Penyakit Dalam","BPJS",{"Senin":"15.00-18.00","Selasa":"15.00-18.00","Rabu":"13.00-15.00","Kamis":"15.00-18.00","Jumat":"15.00-18.00","Sabtu":"10.00-12.00"}],["dr. Dwi Putri Baso, Sp.PD","Spesialis Penyakit Dalam","BPJS",{"Senin":"14.00-16.00","Selasa":"13.00-16.00","Rabu":"14.00-16.00","Kamis":"13.00-16.00","Jumat":"13.00-15.00"}],["dr. Bungsu Wahyu Sp.PD, Subsp. Kv (K), FINASIM","Spesialis Penyakit Dalam","BPJS",{"Jumat":"17.00-19.00","Sabtu":"08.00-10.00"}],["dr. Teddy Kristiyan, Sp.M","Spesialis Mata","BPJS",{"Selasa":"08.00-10.00","Rabu":"08.00-10.00","Kamis":"08.00-10.00","Sabtu":"08.00-14.00"}],["dr. Christiana, Sp.M","Spesialis Mata","BPJS",{"Rabu":"15.00-17.00","Kamis":"15.00-17.00"}],["dr. Yunia Solihat, Sp.M","Spesialis Mata","BPJS",{"Senin":"14.30-16.30","Selasa":"14.30-16.30","Jumat":"14.30-16.30"}],["dr. Nidia Astriani, Sp.M","Spesialis Mata","BPJS",{"Senin":"08.00-14.00","Selasa":"11.00-14.00","Rabu":"11.00-14.00","Kamis":"11.00-14.00","Jumat":"08.00-14.00","Sabtu":"15.00-17.00"}],["dr. Windy Krisanti Dewi, Sp.N","Spesialis Saraf","BPJS",{"Senin":"08.00-10.00 / 13.00-14.00","Selasa":"08.00-10.00 / 13.00-14.00","Rabu":"08.00-10.00 / 13.00-14.00","Kamis":"08.00-10.00 / 13.00-14.00","Jumat":"08.00-10.00 / 13.00-14.00","Sabtu":"10.00-12.00"}],["dr. Kristina Dwi Wahyuni, Sp.S","Spesialis Saraf","BPJS",{"Senin":"16.00-18.00","Selasa":"16.00-18.00","Rabu":"16.00-18.00","Kamis":"16.00-18.00","Jumat":"16.00-18.00","Sabtu":"10.00-12.00 / 14.00-16.00"}],["dr. Angie Renatha A, Sp.THT-KL","Spesialis THT","BPJS",{"Senin":"11.00-12.00 / 14.00-15.00 / 20.00-21.00","Selasa":"11.00-12.00 / 14.00-15.00 / 20.00-21.00","Rabu":"11.00-12.00 / 14.00-15.00 / 20.00-21.00","Kamis":"11.00-12.00 / 14.00-15.00 / 20.00-21.00","Jumat":"11.00-12.00 / 14.00-15.00 / 20.00-21.00","Sabtu":"11.00-12.00"}],["dr. Magdalena Oktavia, Sp.THT-KL","Spesialis THT","BPJS",{"Rabu":"17.00-18.00","Sabtu":"12.00-15.00"}],["dr. Aditya Brahmono, Sp.THT-KL","Spesialis THT","BPJS",{"Senin":"17.30-19.00","Selasa":"17.30-19.00","Kamis":"17.30-19.00","Jumat":"17.30-19.00","Sabtu":"17.30-19.00"}],["dr. Tengku N.S.DAYANG, Sp.DVE","Spesialis Kulit Dan Kelamin","BPJS",{"Senin":"09.00-11.00","Rabu":"09.00-11.00","Sabtu":"11.00-12.00"}],["dr. Ardsari Azminingrum, Sp.DVE, FINSDV","Spesialis Kulit Dan Kelamin","BPJS",{"Selasa":"08.00-09.00","Kamis":"08.00-09.00"}],["dr. Yvonne Agneta Serafien W, Sp.JP, FIHA","Spesialis Jantung","BPJS",{"Senin":"10.00-12.00 / 14.00-16.00","Selasa":"10.00-12.00 / 14.00-16.00","Rabu":"10.00-12.00 / 14.00-16.00","Kamis":"10.00-12.00 / 14.00-16.00","Jumat":"10.00-12.00 / 14.00-16.00","Sabtu":"12.00-13.00"}],["dr. A. Yusri Rachmani D, Sp.JP (K) FIHA","Spesialis Jantung","BPJS",{"Senin":"16.00-18.00","Selasa":"16.00-18.00","Rabu":"16.00-18.00","Kamis":"16.00-18.00","Jumat":"16.00-18.00","Sabtu":"09.00-12.00"}],["dr. Maurits Marpaung, Sp.P","Spesialis Paru","BPJS",{"Senin":"16.00-17.30","Rabu":"16.00-17.00","Kamis":"16.00-18.00","Sabtu":"10.00-11.00"}],["dr. Subagyo, Sp.P","Spesialis Paru","BPJS",{"Senin":"08.00-10.00","Selasa":"19.00-21.00","Kamis":"08.00-10.00","Jumat":"19.00-21.00"}],["dr. Aryani Prawita Sari, Sp.P","Spesialis Paru","BPJS",{"Senin":"19.00-21.00","Rabu":"19.00-21.00","Kamis":"19.00-21.00","Sabtu":"15.00-17.00"}],["dr. Ferdinand H. Simanjuntak, Sp.B","Spesialis Bedah Umum","BPJS",{"Senin":"08.00-10.00 / 13.00-15.00","Selasa":"08.00-10.00 / 13.00-15.00","Rabu":"08.00-10.00 / 13.00-15.00","Kamis":"08.00-10.00 / 13.00-15.00","Jumat":"08.00-10.00 / 13.00-15.00","Sabtu":"08.00-10.00"}],["dr. M.N. Khairuddin, Sp.B","Spesialis Bedah Umum","BPJS",{"Senin":"14.00-16.00","Selasa":"20.00-21.00","Rabu":"14.00-16.00","Kamis":"20.00-21.00","Sabtu":"11.00-12.00"}],["dr. Moch. Rudi Antoni, Sp.B","Spesialis Bedah Umum","BPJS",{"Senin":"17.00-18.00","Selasa":"17.00-18.00","Rabu":"17.00-18.00","Kamis":"17.00-18.00","Jumat":"17.00-18.00","Sabtu":"16.00-18.00"}],["dr. Muhammad Aries Fitrian, Sp.B, FINACS, FICS, AIFO-K","Spesialis Bedah Umum","BPJS",{"Senin":"19.00-20.00","Rabu":"19.00-20.00","Jumat":"19.00-20.00","Sabtu":"17.00-19.00"}],["dr. Efrem Hoesman Ciputra, Ho, Sp.B","Spesialis Bedah Umum","BPJS",{"Senin":"19.00-21.00","Selasa":"19.00-21.00","Rabu":"19.00-21.00","Kamis":"19.00-21.00","Jumat":"19.00-21.00","Sabtu":"14.00-17.00"}],["dr. Lindayanti T, Sp.BA","Spesialis Bedah Anak","BPJS",{"Senin":"09.00-12.00","Selasa":"09.00-12.00 / 15.00-17.00","Rabu":"09.00-12.00","Kamis":"09.00-12.00 / 15.00-17.00","Jumat":"09.00-12.00"}],["dr. Iman Martafani, Sp.BA","Spesialis Bedah Anak","BPJS",{"Senin":"16.00-18.00","Rabu":"16.00-18.00","Jumat":"16.00-18.00","Sabtu":"10.00-12.00"}],["dr. Yuliana Rianto, Sp.OT (K)","Spesialis Bedah Tulang","BPJS",{"Senin":"08.00-09.00","Selasa":"08.00-09.00","Jumat":"08.00-09.00"}],["dr. Hendra Gunawan, Sp.OT","Spesialis Bedah Tulang","BPJS",{"Senin":"20.00-21.00","Selasa":"18.00-19.00","Rabu":"20.00-21.00","Kamis":"18.00-19.00","Jumat":"19.00-20.00"}],["dr. M. Haris Wibowo, Sp.OT","Spesialis Bedah Tulang","BPJS",{"Senin":"17.00-18.00","Selasa":"19.00-20.00","Sabtu":"13.00-15.00"}],["dr. Yusuf Brilliant, Sp.BS, FINSS","Spesialis Bedah Saraf","BPJS",{"Senin":"18.00-19.00","Rabu":"18.00-19.00","Kamis":"19.00-20.00","Sabtu":"13.00-14.00"}],["dr. Endra Wibisono H, Sp.BS, M.Ked.Klin","Spesialis Bedah Saraf","BPJS",{"Selasa":"19.00-20.00","Jumat":"14.00-15.00"}],["dr. Grace Rongre, Sp.B.P.R.E, FICS","Spesialis Bedah Plastik","BPJS",{"Selasa":"07.30-09.00","Kamis":"08.00-10.00","Jumat":"07.30-09.00"}],["dr. Eddy Sunarno, Sp.U","Spesialis Bedah Urologi","BPJS",{"Senin":"17.00-19.00","Selasa":"17.00-19.00","Rabu":"17.00-19.00","Kamis":"17.00-19.00","Jumat":"17.00-19.00"}],["dr. Vincentius Daniel, Sp.B-KBD","Spesialis Bedah Digestive","BPJS",{"Selasa":"09.00-12.00","Kamis":"09.00-12.00","Sabtu":"09.00-11.00"}],["dr. Christian Dananto, Sp.BTKV","Spesialis Bedah Kardiovaskular","BPJS",{"Senin":"18.00-19.00","Selasa":"18.00-19.00","Rabu":"18.00-19.00","Kamis":"18.00-19.00"}],["dr. Andre Grahana Baskara S, SP.B, SUB SP BVE (K)","Spesialis Bedah Kardiovaskular","BPJS",{"Jumat":"19.00-20.00","Sabtu":"19.00-20.00"}],["dr. Emy Pramita Utami, Sp.GK","Spesialis Gizi Klinik","BPJS",{"Jumat":"16.00-17.00","Sabtu":"16.00-17.00"}],["dr. Dradjat Witjaksono, Sp.KJ","Spesialis Kedokteran Jiwa","BPJS",{"Senin":"15.00-18.00","Selasa":"16.00-18.00","Rabu":"16.00-18.00","Kamis":"16.00-18.00","Jumat":"16.00-18.00"}],["dr. Maulin Hikmah, Sp.KFR","Spesialis Rehab Medik","BPJS",{"Sabtu":"15.30-17.30"}],["dr. Christine Militza Kolinug, Sp.KFR","Spesialis Rehab Medik","BPJS",{"Rabu":"16.15-17.15","Jumat":"15.00-16.30"}],["dr. Bernadete Rizky Natalia, Sp. KFR","Spesialis Rehab Medik","BPJS",{"Senin":"08.00-15.30","Selasa":"10.00-15.30","Rabu":"08.00-15.30","Kamis":"10.00-15.30","Jumat":"08.00-12.00","Sabtu":"09.00-15.00"}],["drg. Elya Blandina Ginting, Sp.BM","Spesialis Bedah Mulut","BPJS",{"Senin":"08.00-10.00","Selasa":"08.00-10.00","Rabu":"08.30-10.00","Kamis":"08.00-10.00","Jumat":"09.30-11.00","Sabtu":"08.00-10.00"}],["drg. Endah Srimulyani, Sp.KGA","Spesialis Kedokteran Gigi Anak","BPJS",{"Jumat":"13.30-14.30"}],["drg. Faizal Hasan, Sp.KGA","Spesialis Kedokteran Gigi Anak","BPJS",{"Rabu":"07.00-08.00"}],["drg. Ervita Koelestyana, Sp.KG","Spesialis Konservasi Gigi","BPJS",{"Kamis":"14.00-15.00"}],["drg. Koerniasari, Sp.KG","Spesialis Konservasi Gigi","BPJS",{"Rabu":"16.00-17.00"}],["drg. Mohammad Riza Tofani, Sp.PERIO","Spesialis Periodonsi","BPJS",{"Jumat":"09.00-11.00"}],["drg. Anastasia Purnama Agustina SP. Pros","Spesialis Prostodonsia","BPJS",{"Senin":"16.00-17.00","Selasa":"18.00-19.00"}],["Dokter Umum & IGD","Umum dan IGD","BPJS",{"Senin":"24 Jam","Selasa":"24 Jam","Rabu":"24 Jam","Kamis":"24 Jam","Jumat":"24 Jam","Sabtu":"24 Jam","Minggu":"24 Jam"}]],"contacts":[{"id":"WA-01","label":"Luthfi Kurnia","number":"6282392131622","purposes":"paket,booking"},{"id":"WA-02","label":"Cahyaningdiyah Puspitasari","number":"6285311664671","purposes":"paket,booking"},{"id":"WA-03","label":"Rendika Omega Cinta B","number":"6285753453145","purposes":"paket,booking"},{"id":"WA-04","label":"Andini Prayitno","number":"6282155227397","purposes":"paket,telemedicine,booking"},{"id":"WA-05","label":"Noviyanti","number":"628553242605","purposes":"paket,telemedicine,booking"},{"id":"WA-06","label":"SPGDT 24 Jam","number":"6281257793819","purposes":"igd"}]};
+const DEFAULT_SET = {"hero_title":"Layanan kesehatan keluarga, dekat dari rumah Anda.","hero_text":"Lihat promo, katalog Paket MCU, paket layanan, jadwal dokter, dan daftar telemedicine dari satu halaman.","greeting_paket":"Halo Bapak/ Ibu","greeting_tele":"Halo Ibu","greeting_booking":"Halo Bapak/ Ibu","mcu_note":"Tarif 2026. Rincian pemeriksaan dan total harga per paket. Syarat dan ketentuan berlaku.","jadwal_update":"Oktober 2026","jadwal_note":"Jadwal dokter sewaktu-waktu dapat berubah. Bisa chat petugas dan Instagram kami untuk info lebih lanjut :)","instagram_url":"https://www.instagram.com/rsuherminabalikpapan","instagram_label":"@rsuherminabalikpapan","info_nonbpjs":"Poliklinik Padma (Non BPJS). Pendaftaran: 08115422525 (chat only) atau aplikasi Halo Hermina.","info_bpjs":"Poliklinik Kamala (BPJS). Pendaftaran melalui Mobile JKN.","jkn_android":"https://play.google.com/store/apps/details?id=app.bpjs.mobile&hl=id","jkn_ios":"https://apps.apple.com/id/app/mobile-jkn/id1237601115","spgdt_text":"IGD & Layanan SPGDT 24 Jam","spgdt_sub":"Ambulans dan gawat darurat, ketuk untuk chat WhatsApp","spgdt_message":"Halo SPGDT RS Hermina Balikpapan, saya membutuhkan bantuan IGD/ambulans.","footer_text":"Tarif dan jadwal dapat berubah; konfirmasi ke petugas sebelum datang. Call Center Hermina 1500-488 · herminahospitals.com"};
+const DAYS=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+
+const S = {promos:[],mcu:[],packages:[],docRows:[],contacts:[],set:Object.assign({},DEFAULT_SET),groups:[],mcuCat:'',pkgCat:'',payer:'',docLimit:24,slide:0,timer:null,
+  token:sessionStorage.getItem('hm_token')||'',admin:JSON.parse(sessionStorage.getItem('hm_admin')||'null')};
+const T={lat:null,lon:null};
+const $=id=>document.getElementById(id);
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl=u=>/^https?:\/\//i.test(u||'')?esc(u):'';
+const demoMode=()=>!API_URL||API_URL.indexOf('YOUR_')===0;
+const rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+const icons=()=>window.lucide&&lucide.createIcons();
+const fmtDate=d=>{if(!d)return '';const x=new Date(d+'T00:00:00');return isNaN(x)?d:x.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});};
+const lines=v=>Array.isArray(v)?v:String(v==null?'':v).split('\n').map(s=>s.trim()).filter(Boolean);
+const opts=it=>lines(it.options).map(l=>{const p=l.split('|');return {label:p[0].trim(),price:Number(String(p[1]||'').replace(/\D/g,''))||0};});
+const waLink=(num,text)=>'https://wa.me/'+num+'?text='+encodeURIComponent(text);
+const forPurpose=p=>{const l=S.contacts.filter(c=>String(c.purposes||'paket').split(',').map(s=>s.trim()).includes(p));return l.length?l:(p==='igd'?[{label:'SPGDT 24 Jam',number:SPGDT_NUMBER}]:[{label:'Pendaftaran',number:WA_NUMBER}]);};
+const bullets=arr=>{let h='',open=false;lines(arr).forEach(l=>{if(l.endsWith(':')){if(open){h+='</ul>';open=false;}h+=`<p class="bh">${esc(l.slice(0,-1))}</p>`;}else{if(!open){h+='<ul class="bullets">';open=true;}h+=`<li>${esc(l)}</li>`;}});return h+(open?'</ul>':'');};
+
+/* ===== API ===== */
+async function apiGet(a){const r=await fetch(API_URL+'?action='+a);const j=await r.json();if(!j.success)throw new Error(j.error||'Gagal memuat data');return j.data;}
+async function apiPost(p){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});return r.json();}
+function toast(m,ms){const t=$('toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.add('hidden'),ms||4000);}
+function logLead(n,s,k){if(demoMode())return;apiPost({action:'submitLead',name:n,service:s,notes:k}).catch(()=>{});}
+
+function seedDocRows(){const r=[];SEED.docs.forEach(d=>Object.keys(d[3]).forEach(day=>r.push({name:d[0],specialization:d[1],payer:d[2],day:day,schedule:d[3][day]})));return r;}
+function useSeed(){Object.assign(S,{promos:SEED.promos,mcu:SEED.mcu,packages:SEED.packages,docRows:seedDocRows(),contacts:SEED.contacts});S.set=Object.assign({},DEFAULT_SET);}
+async function loadAll(quiet){
+  if(demoMode()){useSeed();if(!quiet)toast('Mode awal: isi API_URL di index.html agar data dibaca dari Google Sheets.',7000);}
+  else{
+    try{
+      const [p,m,k,d,c,s]=await Promise.all([apiGet('getPromos'),apiGet('getMcu'),apiGet('getPackages'),apiGet('getDoctors'),apiGet('getContacts'),apiGet('getSettings')]);
+      Object.assign(S,{promos:p,mcu:m,packages:k,docRows:d,contacts:c});S.set=Object.assign({},DEFAULT_SET,s);
+    }catch(e){useSeed();if(!quiet)toast('Data belum bisa dimuat dari server. Menampilkan data awal.',6000);}
+  }
+  buildGroups();renderAll();
+}
+function buildGroups(){
+  const map={};
+  S.docRows.forEach(r=>{const k=r.payer+'|'+r.name;(map[k]=map[k]||{name:r.name,spec:r.specialization,payer:r.payer||'Non BPJS',days:{}}).days[r.day]=r.schedule;});
+  S.groups=Object.values(map).sort((a,b)=>a.spec.localeCompare(b.spec)||a.name.localeCompare(b.name));
+}
+function applySettings(){
+  const m={'hero-title':'hero_title','hero-text':'hero_text','mcu-note':'mcu_note','jadwal-update':'jadwal_update','jadwal-note':'jadwal_note','ig-label':'instagram_label','spgdt-text':'spgdt_text','spgdt-sub':'spgdt_sub','footer-text':'footer_text'};
+  Object.keys(m).forEach(id=>{$(id).textContent=S.set[m[id]]||'';});
+  $('ig-link').href=safeUrl(S.set.instagram_url)||'#';
+  const sp=forPurpose('igd')[0].number;
+  $('spgdt-bar').href=waLink(sp,S.set.spgdt_message||''); $('emergency-link').href='tel:+'+sp;
+}
+function renderAll(){applySettings();renderCarousel();renderMcuChips();renderMcu();renderPkgChips();renderPkgs();renderPayer();fillSpecs();renderDoctors();fillTele();icons();}
+
+/* ===== PROMO (carousel) ===== */
+function renderCarousel(){
+  const box=$('carousel-slides'),dots=$('carousel-dots'),n=S.promos.length;
+  if(!n){box.innerHTML='<div class="p-10 text-center" style="color:var(--muted)">Belum ada promo aktif saat ini.</div>';dots.innerHTML='';$('promo-counter').textContent='';return;}
+  S.slide=(S.slide+n)%n;const p=S.promos[S.slide],img=safeUrl(p.bannerUrl),det=lines(p.details);
+  const period=(p.startDate||p.endDate)?fmtDate(p.startDate)+' – '+fmtDate(p.endDate):'';
+  box.innerHTML=`<div class="slide grid sm:grid-cols-5">
+    ${img?`<div class="h-40 sm:h-auto sm:col-span-2 bg-cover bg-center" style="background-image:url('${img}')"></div>`:`<div class="hidden sm:flex sm:col-span-2 items-center justify-center text-white" style="background:linear-gradient(135deg,var(--accent),var(--accent-2))"><i data-lucide="stethoscope" class="w-14 h-14 opacity-80"></i></div>`}
+    <div class="sm:col-span-3 p-5 flex flex-col gap-2.5">
+      ${p.discountDetails?`<span class="self-start text-xs font-bold px-3 py-1 rounded-full" style="background:var(--accent-2);color:#14213A">${esc(p.discountDetails)}</span>`:''}
+      <h3 class="text-xl font-bold leading-snug">${esc(p.title)}</h3>
+      ${p.description?`<p class="text-sm" style="color:var(--muted)">${esc(p.description)}</p>`:''}
+      ${det.length?`<ul class="bullets">${det.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+      ${Number(p.price)?`<p class="text-lg font-bold" style="color:var(--accent)">${rp(p.price)}</p>`:''}
+      ${period?`<p class="text-xs font-semibold" style="color:var(--muted)">Periode ${esc(period)}</p>`:''}
+      <button class="btn btn-wa self-start" onclick="openOrder('promo',${S.slide})"><i data-lucide="message-circle" class="w-4 h-4"></i>Pesan via WhatsApp</button>
+    </div></div>`;
+  dots.innerHTML=S.promos.map((_,i)=>`<button class="w-2.5 h-2.5 rounded-full" style="background:${i===S.slide?'var(--accent)':'rgba(20,33,58,.25)'}" onclick="goSlide(${i})" aria-label="Promo ${i+1}"></button>`).join('');
+  $('promo-counter').textContent=(S.slide+1)+' / '+n;icons();
+}
+function goSlide(i){S.slide=i;renderCarousel();restartTimer();}
+function moveSlide(d){S.slide+=d;renderCarousel();restartTimer();}
+function restartTimer(){clearInterval(S.timer);if(S.promos.length>1&&!matchMedia('(prefers-reduced-motion: reduce)').matches)S.timer=setInterval(()=>{S.slide++;renderCarousel();},9000);}
+
+/* ===== PAKET MCU ===== */
+function chipRow(el,items,cur,cb){el.innerHTML=['Semua',...items].map(c=>{const v=c==='Semua'?'':c;return `<button class="chip" aria-pressed="${cur===v}" data-v="${esc(v)}">${esc(c)}</button>`;}).join('');el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>cb(b.dataset.v));}
+function renderMcuChips(){chipRow($('mcu-chips'),[...new Set(S.mcu.map(m=>m.category).filter(Boolean))],S.mcuCat,v=>{S.mcuCat=v;renderMcuChips();renderMcu();});}
+function renderMcu(){
+  const q=$('mcu-search').value.toLowerCase();
+  const list=S.mcu.map((m,i)=>({m,i})).filter(({m})=>(!S.mcuCat||m.category===S.mcuCat)&&(m.name+' '+lines(m.items).join(' ')).toLowerCase().includes(q));
+  $('mcu-grid').innerHTML=list.length?list.map(({m,i})=>`<article class="acrylic card tile p-5 gap-3">
+    <div class="flex items-start justify-between gap-3"><h3 class="font-bold text-lg leading-snug clamp2 min-h-[3.1rem]">${esc(m.name)}</h3><span class="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0" style="background:rgba(4,120,87,.12);color:var(--accent)">${esc(m.category)}</span></div>
+    <p class="text-2xl font-bold" style="color:var(--accent)">${rp(m.total)}</p>
+    <p class="text-sm flex-1" style="color:var(--muted)">${lines(m.items).length} pemeriksaan</p>
+    <div class="grid grid-cols-2 gap-2"><button class="btn btn-glass" onclick="showMcu(${i})"><i data-lucide="list" class="w-4 h-4"></i>Rincian</button><button class="btn btn-wa" onclick="openOrder('mcu',${i})"><i data-lucide="message-circle" class="w-4 h-4"></i>Pesan</button></div></article>`).join(''):'<p class="col-span-full text-center py-8" style="color:var(--muted)">Paket tidak ditemukan.</p>';
+  icons();
+}
+function showDetail(title,html){$('detail-title').textContent=title;$('detail-body').innerHTML=html;openModal('detail-modal');}
+function showMcu(i){const m=S.mcu[i];showDetail(m.name,`<p class="text-2xl font-bold mb-3" style="color:var(--accent)">${rp(m.total)}</p>${bullets(m.items)}<button class="btn btn-wa w-full mt-5" onclick="openOrder('mcu',${i})"><i data-lucide="message-circle" class="w-4 h-4"></i>Pesan paket via WhatsApp</button>`);}
+
+/* ===== PAKET LAYANAN ===== */
+function renderPkgChips(){chipRow($('pkg-chips'),[...new Set(S.packages.map(p=>p.category).filter(Boolean))],S.pkgCat,v=>{S.pkgCat=v;renderPkgChips();renderPkgs();});}
+function renderPkgs(){
+  const q=$('pkg-search').value.toLowerCase();
+  const list=S.packages.map((p,i)=>({p,i})).filter(({p})=>(!S.pkgCat||p.category===S.pkgCat)&&(p.name+' '+(p.description||'')+' '+lines(p.details).join(' ')).toLowerCase().includes(q));
+  $('pkg-grid').innerHTML=list.length?list.map(({p,i})=>{const o=opts(p),min=o.length?Math.min(...o.map(x=>x.price).filter(Boolean)):0;return `<article class="acrylic card tile p-5 gap-3">
+    <div class="flex items-start justify-between gap-3"><h3 class="font-bold text-lg leading-snug clamp2 min-h-[3.1rem]">${esc(p.name)}</h3><span class="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0" style="background:rgba(4,120,87,.12);color:var(--accent)">${esc(p.category)}</span></div>
+    <p class="text-2xl font-bold" style="color:var(--accent)">${min&&isFinite(min)?'Mulai '+rp(min):'Hubungi petugas'}</p>
+    <p class="text-sm flex-1 clamp3" style="color:var(--muted)">${esc(p.description)}</p>
+    <div class="grid grid-cols-2 gap-2"><button class="btn btn-glass" onclick="showPkg(${i})"><i data-lucide="list" class="w-4 h-4"></i>Rincian</button><button class="btn btn-wa" onclick="openOrder('pkg',${i})"><i data-lucide="message-circle" class="w-4 h-4"></i>Pesan</button></div></article>`;}).join(''):'<p class="col-span-full text-center py-8" style="color:var(--muted)">Paket tidak ditemukan.</p>';
+  icons();
+}
+function showPkg(i){
+  const p=S.packages[i],o=opts(p),t=lines(p.terms);
+  showDetail(p.name,`${p.description?`<p class="text-sm mb-3" style="color:var(--muted)">${esc(p.description)}</p>`:''}${bullets(p.details)}
+    ${o.length?`<p class="bh">Pilihan dan harga</p><ul class="mt-1 text-sm space-y-1">${o.map(x=>`<li class="flex justify-between gap-3 rounded px-2 py-1" style="background:rgba(4,120,87,.08)"><span>${esc(x.label)}</span><b class="shrink-0">${rp(x.price)}</b></li>`).join('')}</ul>`:''}
+    ${t.length?`<p class="bh">Syarat dan ketentuan</p><ul class="bullets">${t.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    ${p.note?`<p class="text-xs mt-3" style="color:var(--muted)">${esc(p.note)}</p>`:''}
+    <button class="btn btn-wa w-full mt-5" onclick="openOrder('pkg',${i})"><i data-lucide="message-circle" class="w-4 h-4"></i>Pesan via WhatsApp</button>`);
+}
+
+/* ===== JADWAL DOKTER ===== */
+function renderPayer(){
+  chipRow($('payer-chips'),['Non BPJS','BPJS'],S.payer,v=>{S.payer=v;resetDocs();renderPayer();});
+  $('payer-chips').querySelectorAll('.chip').forEach(b=>{const v=b.dataset.v;b.textContent=v===''?'Semua':v==='BPJS'?'Kamala (BPJS)':'Padma (Non BPJS)';});
+  $('payer-info').textContent=S.payer==='BPJS'?S.set.info_bpjs:S.payer==='Non BPJS'?S.set.info_nonbpjs:'';
+}
+function fillSpecs(){const s=[...new Set(S.groups.map(g=>g.spec))];const cur=$('doctor-spec').value;$('doctor-spec').innerHTML='<option value="">Semua spesialisasi</option>'+s.map(x=>`<option>${esc(x)}</option>`).join('');$('doctor-spec').value=cur;}
+function resetDocs(){S.docLimit=24;renderDoctors();}
+function renderDoctors(){
+  const q=$('doctor-search').value.toLowerCase(),sp=$('doctor-spec').value,day=$('doctor-day').value;
+  const list=S.groups.map((g,i)=>({g,i})).filter(({g})=>(!S.payer||g.payer===S.payer)&&(!sp||g.spec===sp)&&(!day||g.days[day])&&g.name.toLowerCase().includes(q));
+  $('doctor-count').textContent=list.length+' dokter ditemukan';
+  $('doctors-grid').innerHTML=list.slice(0,S.docLimit).map(({g,i})=>`<article class="acrylic card tile p-5 gap-3">
+    <div class="flex items-start justify-between gap-2"><div class="min-w-0"><h3 class="font-bold leading-snug clamp2 min-h-[2.7rem]" title="${esc(g.name)}">${esc(g.name)}</h3><p class="text-sm clamp1" style="color:var(--muted)" title="${esc(g.spec)}">${esc(g.spec)}</p></div><span class="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0" style="background:${g.payer==='BPJS'?'rgba(245,179,1,.3)':'rgba(4,120,87,.12)'}">${esc(g.payer)}</span></div>
+    <ul class="daylist flex-1">${DAYS.map(d=>`<li class="flex justify-between gap-3 rounded px-1.5 ${d===day?'font-bold':''}" ${d===day?'style="background:rgba(245,179,1,.3)"':''}><span>${d}</span><span class="truncate text-right" title="${esc(g.days[d]||'')}" ${g.days[d]?'':'style="color:#9aa5b8"'}>${g.days[d]?esc(g.days[d]):'–'}</span></li>`).join('')}</ul>
+    <div class="grid grid-cols-2 gap-2"><button class="btn btn-wa !px-2" onclick="bookDoctor(${i})"><i data-lucide="${g.payer==='BPJS'?'smartphone':'calendar-check'}" class="w-4 h-4"></i>${g.payer==='BPJS'?'Mobile JKN':'Booking'}</button><button class="btn btn-glass !px-2" onclick="teleFor(${i})"><i data-lucide="video" class="w-4 h-4"></i>Telemedicine</button></div></article>`).join('')||'<p class="col-span-full text-center py-8" style="color:var(--muted)">Jadwal tidak ditemukan.</p>';
+  $('doctor-more').classList.toggle('hidden',list.length<=S.docLimit);icons();
+}
+function chatStaff(){
+  const msg='Halo RS Hermina Balikpapan, saya ingin menanyakan jadwal dokter.';
+  showDetail('Chat petugas',`<p class="text-sm mb-3" style="color:var(--muted)">Pilih petugas yang ingin dihubungi.</p><div class="grid gap-2">${forPurpose('paket').map(c=>`<a class="radio-row" target="_blank" rel="noopener" href="${waLink(c.number,msg)}"><i data-lucide="message-circle" class="w-4 h-4" style="color:#128C4A"></i>${esc(c.label)}</a>`).join('')}</div>`);icons();
+}
+
+/* ===== BOOKING DOKTER ===== */
+let BOOK=null;
+function bookDoctor(i){
+  const g=S.groups[i];
+  if(g.payer==='BPJS'){openJKN();return;}
+  BOOK=g;$('b-spec').value=g.spec;$('b-doc').value=g.name;$('b-date').min=new Date().toISOString().slice(0,10);
+  $('b-days').textContent='Jadwal praktik: '+(DAYS.filter(d=>g.days[d]).map(d=>d+' '+g.days[d]).join(', ')||'-');
+  staffRadios($('book-staff'),'booking','bstaff');openModal('book-modal');$('b-name').focus();
+}
+function sendBooking(e){
+  e.preventDefault();const st=pickedStaff('booking','bstaff'),dt=new Date($('b-date').value+'T00:00:00');
+  if(!BOOK.days[DAYS[(dt.getDay()+6)%7]]&&!confirm('Dokter tidak praktik pada hari tersebut. Tetap lanjutkan?'))return;
+  const when=dt.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const msg=`${S.set.greeting_booking} ${st.label} saya mau Booking Dokter dengan Rincian Sebagai Berikut :\nNama Pasien : ${$('b-name').value.trim()}\nAlamat : ${$('b-addr').value.trim()}\nSpesialisasi : ${$('b-spec').value}\nNama Dokter : ${$('b-doc').value}\nRencana Berobat : ${when}\nPenjaminan : ${$('b-pay').value}`;
+  window.open(waLink(st.number,msg),'_blank','noopener');
+  logLead($('b-name').value,'Booking dokter: '+$('b-doc').value,'Rencana: '+when+' | Penjaminan: '+$('b-pay').value+' | Petugas: '+st.label);
+  closeModals();$('book-modal').querySelector('form').reset();
+}
+function openJKN(){
+  const ua=navigator.userAgent,a=S.set.jkn_android,i=S.set.jkn_ios,pkg=(String(a).match(/id=([\w.]+)/)||[])[1]||'app.bpjs.mobile';
+  if(/android/i.test(ua)){toast('Membuka aplikasi Mobile JKN...');location.href='intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package='+pkg+';S.browser_fallback_url='+encodeURIComponent(a)+';end';return;}
+  if(/iphone|ipad|ipod/i.test(ua)){toast('Membuka aplikasi Mobile JKN...');location.href=i;return;}
+  showDetail('Booking jadwal BPJS (Kamala)',`<p class="text-sm mb-3">Pendaftaran poliklinik BPJS dilakukan lewat aplikasi <b>Mobile JKN</b> di HP Anda. Buka tautan ini dari HP, atau pasang aplikasinya lewat:</p><div class="grid gap-2"><a class="btn btn-primary" target="_blank" rel="noopener" href="${safeUrl(a)}">Android (Google Play)</a><a class="btn btn-glass" target="_blank" rel="noopener" href="${safeUrl(i)}">iPhone / iPad (App Store)</a></div>`);
+}
+
+/* ===== FORM PESAN PAKET / PROMO ===== */
+function staffRadios(el,purpose,name){el.innerHTML=forPurpose(purpose).map((c,i)=>`<label class="radio-row"><input type="radio" name="${name}" value="${i}" ${i===0?'checked':''}><span>${esc(c.label)}</span></label>`).join('');}
+function pickedStaff(purpose,name){const v=document.querySelector(`input[name="${name}"]:checked`);return forPurpose(purpose)[v?+v.value:0];}
+let ORDER={kind:'mcu',opts:[]};
+function openOrder(kind,i){
+  const it=kind==='mcu'?S.mcu[i]:kind==='promo'?S.promos[i]:S.packages[i];
+  const o=kind==='pkg'?opts(it):[];ORDER={kind:kind,opts:o,name:it.name||it.title};
+  $('order-title').textContent=kind==='mcu'?'Pesan paket MCU':'Pesan paket / promo';
+  $('o-pack').value=ORDER.name;$('o-date').min=new Date().toISOString().slice(0,10);
+  $('o-opt-wrap').classList.toggle('hidden',!o.length);$('o-opt').required=!!o.length;
+  $('o-opt').innerHTML=o.map((x,j)=>`<option value="${j}">${esc(x.label)} (${rp(x.price)})</option>`).join('');
+  staffRadios($('order-staff'),'paket','staff');openModal('order-modal');$('o-name').focus();
+}
+function sendOrder(e){
+  e.preventDefault();const st=pickedStaff('paket','staff');
+  const what=ORDER.kind==='mcu'?'paket MCU':'paket/promo';
+  const d=new Date($('o-date').value+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const when=d+($('o-note').value.trim()?' ('+$('o-note').value.trim()+')':'');
+  let pack=$('o-pack').value.trim();
+  if(ORDER.opts.length){const x=ORDER.opts[+$('o-opt').value];pack+=' - '+x.label+' ('+rp(x.price)+')';}
+  const msg=`${S.set.greeting_paket} ${st.label} saya mau Pesan ${what} Rincian Sebagai Berikut :\nNama Pasien : ${$('o-name').value.trim()}\nAlamat : ${$('o-addr').value.trim()}\nNama Paket yang di ambil : ${pack}\nRencana Pelaksanaan : ${when}`;
+  window.open(waLink(st.number,msg),'_blank','noopener');
+  logLead($('o-name').value,'Pesan '+what+': '+pack,'Rencana: '+when+' | Petugas: '+st.label+' | Alamat: '+$('o-addr').value);
+  closeModals();$('order-modal').querySelector('form').reset();
+}
+
+/* ===== TELEMEDICINE ===== */
+function fillTele(){
+  staffRadios($('tele-staff'),'telemedicine','tstaff');
+  const sp=[...new Set(S.groups.map(g=>g.spec))];const cur=$('t-spec').value;
+  $('t-spec').innerHTML='<option value="">Pilih spesialisasi</option>'+sp.map(s=>`<option>${esc(s)}</option>`).join('');$('t-spec').value=cur;fillTeleDoctors();
+}
+function fillTeleDoctors(){
+  const sp=$('t-spec').value,names=[...new Set(S.groups.filter(g=>g.spec===sp).map(g=>g.name))];
+  $('t-doc').innerHTML=sp?'<option value="">Pilih dokter</option><option>Dokter yang tersedia (sesuai jadwal)</option>'+names.map(n=>`<option>${esc(n)}</option>`).join(''):'<option value="">Pilih spesialisasi dulu</option>';
+}
+function teleFor(i){const g=S.groups[i];$('t-spec').value=g.spec;fillTeleDoctors();$('t-doc').value=g.name;$('telemedicine').scrollIntoView({behavior:'smooth'});$('t-name').focus({preventScroll:true});}
+function setPin(lat,lon){
+  T.lat=lat;T.lon=lon;const d=0.004;$('map-box').classList.remove('hidden');
+  $('map-frame').src=`https://www.openstreetmap.org/export/embed.html?bbox=${lon-d},${lat-d*0.6},${lon+d},${lat+d*0.6}&layer=mapnik&marker=${lat},${lon}`;
+  $('coord-text').textContent=lat.toFixed(6)+', '+lon.toFixed(6);
+  $('map-open').href=`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
+  $('t-link').value=`https://www.google.com/maps?q=${lat},${lon}`;
+}
+function useMyLocation(){
+  if(!navigator.geolocation)return toast('Peramban ini tidak mendukung lokasi. Gunakan Cari alamat di peta.',6000);
+  toast('Mengambil lokasi Anda...');
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const lat=pos.coords.latitude,lon=pos.coords.longitude;setPin(lat,lon);
+    try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=id&lat=${lat}&lon=${lon}`);const j=await r.json();if(j.display_name){$('t-addr').value=j.display_name;toast('Alamat terisi dari lokasi Anda. Periksa dan lengkapi bila perlu.',5000);}}
+    catch(_){toast('Titik lokasi tersimpan, tetapi alamat otomatis belum bisa dimuat. Isi alamat secara manual.',6000);}
+  },()=>toast('Lokasi tidak bisa diakses. Izinkan akses lokasi di peramban atau isi alamat manual.',6000),{enableHighAccuracy:true,timeout:15000});
+}
+async function searchAddress(){
+  const q=$('t-addr').value.trim();if(!q)return toast('Ketik alamat dulu, lalu tekan Cari alamat di peta.');
+  try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=id&accept-language=id&q='+encodeURIComponent(q));const j=await r.json();
+    if(!j.length)return toast('Alamat tidak ditemukan. Coba tulis nama jalan dan kota, atau pakai Lokasi saya.',6000);
+    setPin(+j[0].lat,+j[0].lon);toast('Titik peta ditemukan. Periksa apakah sudah sesuai.');
+  }catch(_){toast('Pencarian peta sedang tidak tersedia. Pakai Lokasi saya atau tempel tautan peta.',6000);}
+}
+function sendTele(e){
+  e.preventDefault();const st=pickedStaff('telemedicine','tstaff');
+  const link=$('t-link').value.trim(),coord=T.lat!=null?T.lat.toFixed(6)+', '+T.lon.toFixed(6):'';
+  const msg=`${S.set.greeting_tele} ${st.label} saya mau Telemedicine dengan Rincian Sebagai Berikut :\nNama Pasien : ${$('t-name').value.trim()}\nAlamat : ${$('t-addr').value.trim()}\nSpesialisasi : ${$('t-spec').value}\nNama Dokter : ${$('t-doc').value}\nTitik Koordinat : ${[coord,link].filter(Boolean).join(' ')||'-'}`;
+  window.open(waLink(st.number,msg),'_blank','noopener');
+  logLead($('t-name').value,'Telemedicine: '+$('t-spec').value+' - '+$('t-doc').value,'Alamat: '+$('t-addr').value+' | Peta: '+link+' | Petugas: '+st.label);
+}
+
+/* ===== MODAL ===== */
+function openModal(id){closeModals();$(id).classList.add('open');icons();const f=$(id).querySelector('input:not([type=radio]):not([readonly]),textarea');f&&f.focus();}
+function closeModals(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'));}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModals();});
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('mousedown',e=>{if(e.target===m)closeModals();}));
+
+/* ===== ADMIN (semua data bisa diubah) ===== */
+const PUR=[['paket','Paket & promo'],['telemedicine','Telemedicine'],['booking','Booking dokter'],['igd','IGD / SPGDT']];
+const ADM={
+ Promos:{t:'Promo',help:'Kartu promo di halaman depan. Rincian: satu poin per baris.',cols:['title','discountDetails','isActive'],f:[['title','Judul promo','text'],['description','Deskripsi singkat','area'],['details','Rincian (satu poin per baris)','area6'],['discountDetails','Keterangan singkat','text'],['price','Harga (Rp, opsional)','num'],['bannerUrl','URL gambar banner (opsional)','url'],['startDate','Mulai (kosong = selalu tampil)','date'],['endDate','Berakhir','date'],['isActive','Tampilkan di website','bool']]},
+ MCU:{t:'Paket MCU',help:'Rincian pemeriksaan: satu per baris.',cols:['name','category','total','isActive'],f:[['name','Nama paket','text'],['category','Kategori','text'],['items','Rincian pemeriksaan (satu per baris)','area10'],['total','Total (Rp)','num'],['isActive','Tampilkan di website','bool']]},
+ Packages:{t:'Paket Layanan',help:'Baris rincian yang berakhiran titik dua (:) tampil sebagai sub-judul. Pilihan harga: NAMA|HARGA, satu per baris.',cols:['name','category','isActive'],f:[['name','Nama paket','text'],['category','Kategori','text'],['description','Deskripsi singkat','area'],['details','Rincian (satu poin per baris)','area10'],['options','Pilihan & harga (NAMA|HARGA per baris)','area6'],['terms','Syarat dan ketentuan (per baris)','area6'],['note','Catatan','text'],['isActive','Tampilkan di website','bool']]},
+ Doctors:{t:'Jadwal Dokter',help:'Satu baris per dokter per hari. Gunakan pencarian untuk menemukan dokter.',cols:['name','specialization','day','schedule','payer'],f:[['name','Nama dokter','text'],['specialization','Spesialisasi','text'],['day','Hari','sel:'+DAYS.join(',')],['schedule','Jam praktik (mis. 09.00-12.00)','text'],['payer','Poliklinik','sel:Non BPJS,BPJS'],['photoUrl','URL foto (opsional)','url']]},
+ Contacts:{t:'Kontak WhatsApp',help:'Petugas yang dihubungi pasien. Pilih keperluannya. Maksimal 10 kontak, minimal 1 aktif.',cols:['label','number','purposes','isActive'],f:[['label','Nama petugas','text'],['number','Nomor WhatsApp (08... atau 62...)','text'],['purposes','Untuk keperluan','multi'],['isActive','Aktif','bool']]},
+ Settings:{t:'Teks & Pengaturan',help:'Sapaan WhatsApp, catatan jadwal, link Instagram, link Mobile JKN, dan teks lain di website.',cols:['key','value'],f:[['key','Kunci','key'],['value','Isi','area']],nokey:true}
+};
+const A={sheet:'Promos',rows:[],edit:null};
+const KEYF=s=>s==='Settings'?'key':'id';
+function openLogin(){if(S.token){showAdmin();return;}$('login-error').classList.add('hidden');openModal('login-modal');}
+async function doLogin(e){
+  e.preventDefault();const btn=$('login-btn'),err=$('login-error');btn.disabled=true;btn.textContent='Memeriksa...';err.classList.add('hidden');
+  try{
+    if(demoMode())throw new Error('Isi API_URL di index.html terlebih dahulu.');
+    const r=await apiPost({action:'login',username:$('login-user').value,password:$('login-pass').value});
+    if(!r.success)throw new Error(r.error);
+    S.token=r.token;S.admin=r.admin;sessionStorage.setItem('hm_token',r.token);sessionStorage.setItem('hm_admin',JSON.stringify(r.admin));
+    $('login-pass').value='';closeModals();showAdmin();
+  }catch(ex){err.textContent=ex.message;err.classList.remove('hidden');}
+  btn.disabled=false;btn.textContent='Masuk';
+}
+async function showAdmin(){
+  $('admin-panel').classList.remove('hidden');$('admin-name').textContent=S.admin?('· '+S.admin.name):'';$('btn-admin').classList.add('hidden');
+  renderTabs();await loadAdmin();$('admin-panel').scrollIntoView({behavior:'smooth'});
+}
+function renderTabs(){
+  $('admin-tabs').innerHTML=Object.keys(ADM).map(k=>`<button class="chip" role="tab" aria-pressed="${A.sheet===k}" data-k="${k}">${ADM[k].t}</button>`).join('');
+  $('admin-tabs').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{A.sheet=b.dataset.k;$('admin-search').value='';renderTabs();loadAdmin();});
+  $('admin-help').textContent=ADM[A.sheet].help;$('admin-add').classList.toggle('hidden',!!ADM[A.sheet].nokey);
+}
+async function loadAdmin(){
+  $('admin-body').innerHTML='<tr><td class="p-4 text-center" style="color:var(--muted)">Memuat...</td></tr>';
+  try{
+    const r=await apiPost({action:'adminList',token:S.token,sheet:A.sheet});
+    if(!r.success){if(/sesi/i.test(r.error))forceLogout();throw new Error(r.error);}
+    let rows=r.data;
+    if(A.sheet==='Settings'){const m={};rows.forEach(x=>m[x.key]=x);rows=Object.keys(DEFAULT_SET).map(k=>m[k]||{key:k,value:DEFAULT_SET[k],_def:true}).concat(rows.filter(x=>!(x.key in DEFAULT_SET)));}
+    A.rows=rows;renderAdmin();
+  }catch(ex){$('admin-body').innerHTML=`<tr><td class="p-4 text-center" style="color:#C42B1C">${esc(ex.message)}</td></tr>`;}
+}
+function cell(sheet,c,v){
+  if(c==='isActive')return v?'Aktif':'Nonaktif';
+  if(c==='total'||c==='price')return v?rp(v):'';
+  if(c==='purposes')return String(v||'').split(',').map(p=>(PUR.find(x=>x[0]===p.trim())||[0,p])[1]).join(', ');
+  const s=String(v==null?'':v).replace(/\n/g,' · ');return s.length>70?s.slice(0,70)+'…':s;
+}
+function renderAdmin(){
+  const cfg=ADM[A.sheet],q=$('admin-search').value.toLowerCase();
+  const list=A.rows.map((r,i)=>({r,i})).filter(({r})=>JSON.stringify(r).toLowerCase().includes(q));
+  $('admin-head').innerHTML='<tr>'+cfg.cols.map(c=>`<th class="p-2">${c}</th>`).join('')+'<th class="p-2"></th></tr>';
+  $('admin-body').innerHTML=list.slice(0,60).map(({r,i})=>'<tr class="border-t" style="border-color:rgba(20,33,58,.08)">'+cfg.cols.map(c=>`<td class="p-2 ${c==='isActive'?'':'break-words'}">${c==='isActive'?`<button class="chip" aria-pressed="${!!r.isActive}" onclick="toggleActive(${i})">${r.isActive?'Aktif':'Nonaktif'}</button>`:esc(cell(A.sheet,c,r[c]))}</td>`).join('')+`<td class="p-2 text-right"><button class="chip" onclick="openEdit(${i})">Ubah</button></td></tr>`).join('')||'<tr><td class="p-4 text-center" style="color:var(--muted)">Tidak ada data.</td></tr>';
+  $('admin-more').textContent=list.length>60?`Menampilkan 60 dari ${list.length} data. Gunakan pencarian untuk mempersempit.`:`${list.length} data`;
+}
+async function afterChange(){await loadAdmin();await loadAll(true);}
+async function toggleActive(i){
+  const r=Object.assign({},A.rows[i]);r.isActive=!r.isActive;
+  const res=await apiPost({action:'adminSave',token:S.token,sheet:A.sheet,row:r});
+  if(!res.success)return toast(res.error,6000);afterChange();
+}
+function openEdit(i){
+  const cfg=ADM[A.sheet],r=i==null?{}:A.rows[i];A.edit=i==null?null:r;
+  $('edit-title').textContent=(i==null?'Tambah ':'Ubah ')+cfg.t;
+  $('edit-body').innerHTML=cfg.f.map(([k,l,t])=>{
+    const v=r[k]==null?'':r[k],id='f-'+k;let inp='';
+    if(t==='bool')return `<label class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" id="${id}" ${(i==null?true:v)?'checked':''}> ${l}</label>`;
+    if(t==='multi'){const cur=String(v||'paket').split(',').map(s=>s.trim());return `<fieldset><legend class="text-sm font-semibold mb-1">${l}</legend><div class="flex flex-wrap gap-3 text-sm">${PUR.map(([p,pl])=>`<label class="flex items-center gap-1.5"><input type="checkbox" name="f-purposes" value="${p}" ${cur.includes(p)?'checked':''}> ${pl}</label>`).join('')}</div></fieldset>`;}
+    if(t.startsWith('area'))inp=`<textarea id="${id}" class="fluent-input" rows="${t==='area10'?10:t==='area6'?6:3}">${esc(v)}</textarea>`;
+    else if(t.startsWith('sel:'))inp=`<select id="${id}" class="fluent-input">${t.slice(4).split(',').map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
+    else inp=`<input id="${id}" class="fluent-input" type="${t==='date'?'date':t==='url'?'url':'text'}" ${t==='num'?'inputmode="numeric"':''} value="${esc(v)}" ${t==='key'&&i!=null?'readonly':''}>`;
+    return `<div><label class="block text-sm font-semibold mb-1" for="${id}">${l}</label>${inp}</div>`;
+  }).join('');
+  $('edit-del').classList.toggle('hidden',i==null||!!cfg.nokey);openModal('edit-modal');
+}
+async function saveEdit(e){
+  e.preventDefault();const cfg=ADM[A.sheet],row={};
+  if(A.edit)row[KEYF(A.sheet)]=A.edit[KEYF(A.sheet)];
+  cfg.f.forEach(([k,,t])=>{
+    if(t==='bool')row[k]=$('f-'+k).checked;
+    else if(t==='multi')row[k]=[...document.querySelectorAll('input[name="f-purposes"]:checked')].map(x=>x.value).join(',');
+    else row[k]=$('f-'+k).value;
+  });
+  const b=$('edit-save');b.disabled=true;b.textContent='Menyimpan...';
+  try{const r=await apiPost({action:'adminSave',token:S.token,sheet:A.sheet,row:row});if(!r.success)throw new Error(r.error);closeModals();toast('Tersimpan.');afterChange();}
+  catch(ex){toast('Gagal menyimpan: '+ex.message,6000);}
+  b.disabled=false;b.textContent='Simpan';
+}
+async function deleteEdit(){
+  if(!A.edit||!confirm('Hapus data ini?'))return;
+  const r=await apiPost({action:'adminDelete',token:S.token,sheet:A.sheet,id:A.edit[KEYF(A.sheet)]});
+  if(!r.success)return toast(r.error,6000);closeModals();toast('Terhapus.');afterChange();
+}
+function forceLogout(){S.token='';S.admin=null;sessionStorage.clear();$('admin-panel').classList.add('hidden');$('btn-admin').classList.remove('hidden');}
+async function logout(){const t=S.token;forceLogout();try{await apiPost({action:'logout',token:t});}catch(_){}toast('Anda sudah keluar.');}
+
+/* ===== INIT ===== */
+$('year').textContent=new Date().getFullYear();
+if(LOGO_URL){const b=$('brand-logo');b.style.background='none';b.style.width='auto';b.innerHTML=`<img src="${esc(LOGO_URL)}" alt="Logo RS Hermina Balikpapan" class="h-10 w-auto">`;const fi=document.createElement('link');fi.rel='icon';fi.href=LOGO_URL;document.head.appendChild(fi);}
+if(S.token)showAdmin();
+loadAll().then(restartTimer);
+$('carousel').addEventListener('mouseenter',()=>clearInterval(S.timer));
+$('carousel').addEventListener('mouseleave',restartTimer);
+</script>
+</body>
+</html>
